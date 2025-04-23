@@ -331,11 +331,16 @@
                     console.log("Viz is ready");
                     if (window.viz) {
                         ready();
-                    }
-                }
+        }
+                },
+                onTabSwitched: function(event) {
+                    console.log("Tab switched event:", event);
+                    const sheetName = event.getSheetName();
+                    console.log("Switched to sheet:", sheetName);
+                    updateNavigationState(sheetName);
+        }
             };
-            const viz = new tableau.Viz(vizDiv, url, options);
-            window.viz = viz;
+            window.viz = new tableau.Viz(vizDiv, url, options);
         });
     </script>
     <script src="navigation.js"></script>

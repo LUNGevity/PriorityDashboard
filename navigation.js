@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextButton = document.querySelector('.nav-button.next');
     const prevButtonText = document.querySelector('.nav-button-text.prev');
     const nextButtonText = document.querySelector('.nav-button-text.next');
-
+    
     // Initialize the Tableau visualization
     function navigateToPage(page) {
         console.log("Navigating to page:", page);
@@ -29,6 +29,23 @@ document.addEventListener('DOMContentLoaded', function() {
             height: '100%',
             onFirstInteractive: function() {
                 console.log("Viz is ready");
+                // Get the current sheet name and update navigation
+                if (window.viz) {
+                    const workbook = window.viz.getWorkbook();
+                    const currentSheet = workbook.getActiveSheet();
+                    const sheetName = currentSheet.getName();
+                    console.log("Current sheet after navigation:", sheetName);
+                    updateNavigationState(sheetName);
+                    
+                    // Trigger resize handling after a short delay to ensure viz is fully rendered
+                    setTimeout(() => {
+                        if (window.handleResize) {
+                            window.handleResize();
+                        } else {
+                            console.warn("handleResize function not found");
+                        }
+                    }, 100);
+                }
             }
         };
         
@@ -64,14 +81,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Navigate to a specific page index
     function navigateToPageIndex(index) {
-        console.log("Navigating to index:", index);
+        console.log("DEBUG: Navigating to index:", index);
         const items = Array.from(menuItems);
         if (index >= 0 && index < items.length) {
-            items.forEach(i => i.classList.remove('active'));
-            items[index].classList.add('active');
-            const page = items[index].getAttribute('data-page');
-            navigateToPage(page);
-            updateNavigationButtonTexts();
+            // Get the sheet name from the mapping
+            const sheetInfo = Object.values(window.sheetToIndex).find(info => info.index === index);
+            if (sheetInfo) {
+                console.log("DEBUG: Found sheet info for index:", sheetInfo);
+                // Use the global navigation function with the original sheet name
+                window.navigateToSheet(sheetInfo.originalName);
+            } else {
+                console.warn("DEBUG: No sheet info found for index:", index);
+            }
         }
     }
 
@@ -169,4 +190,81 @@ document.addEventListener('DOMContentLoaded', function() {
             updateNavigationButtons();
         }
     });
+
+    // Function to update navigation state based on sheet name
+    function updateNavigationState(sheetName) {
+        console.log("DEBUG: Starting updateNavigationState with sheet name:", sheetName);
+        console.log("DEBUG: Source of navigation:", new Error().stack);
+        
+        // Use the global mapping and normalization function
+        const normalizedSheetName = window.normalizeSheetName(sheetName);
+        const sheetInfo = window.sheetToIndex[normalizedSheetName];
+        
+        console.log("Mapped sheet to index:", sheetInfo?.index);
+        
+        if (sheetInfo) {
+            console.log("Updating navigation state to index:", sheetInfo.index);
+            // Update the navigation state
+            updateNavigationIndex(sheetInfo.index);
+        } else {
+            console.warn("No index found for sheet:", sheetName);
+            // Default to Home if sheet name is unknown
+            updateNavigationIndex(0);
+        }
+    }
+
+    // Function to update navigation state based on index
+    function updateNavigationIndex(index) {
+        console.log("DEBUG: Starting updateNavigationIndex with index:", index);
+        console.log("DEBUG: Source of navigation:", new Error().stack);
+        
+        // Update the active menu item
+        menuItems.forEach(i => i.classList.remove('active'));
+        menuItems[index].classList.add('active');
+        
+        // Update navigation buttons
+        updateNavigationButtons();
+        
+        console.log("DEBUG: Navigation state updated to index:", index);
+    }
+
+    // Make updateNavigationIndex available globally
+    window.updateNavigationIndex = updateNavigationIndex;
+
+    // Function to navigate to a specific sheet by name
+    function navigateToSheet(sheetName) {
+        console.log("DEBUG: Navigating to sheet:", sheetName);
+        
+        // Get the sheet info from the mapping
+        const normalizedSheetName = window.normalizeSheetName(sheetName);
+        const sheetInfo = window.sheetToIndex[normalizedSheetName];
+        
+        if (sheetInfo) {
+            console.log("DEBUG: Found sheet info:", sheetInfo);
+            // Navigate to the sheet in Tableau using the original name
+            if (window.viz) {
+                const workbook = window.viz.getWorkbook();
+                workbook.activateSheetAsync(sheetInfo.originalName).then(() => {
+                    console.log("DEBUG: Successfully activated sheet:", sheetInfo.originalName);
+                    // Update the navigation state
+                    updateNavigationState(sheetInfo.originalName);
+                    
+                    // Trigger resize handling after a short delay to ensure viz is fully rendered
+                    setTimeout(() => {
+                        if (window.handleResize) {
+                            window.handleResize();
+                        } else {
+                            console.warn("handleResize function not found");
+                        }
+                    }, 100);
+                }).catch(error => {
+                    console.error("DEBUG: Error activating sheet:", error);
+                });
+            } else {
+                console.error("DEBUG: Viz not initialized!");
+            }
+        } else {
+            console.warn("DEBUG: Unknown sheet name:", sheetName);
+        }
+    }
 }); 
