@@ -126,25 +126,40 @@
         .viz-container {
             width: 85%;
             max-width: 1600px;
-            height: calc(95vh - 60px) !important;
-            position: relative;
+            height: calc(95vh - 60px);
             margin: 0 auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
         }
 
-        #viz1745364540836,
-        .tableauPlaceholder,
-        .tableauViz,
+        #viz1745364540836 {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .tableauPlaceholder {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .tableauViz {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         iframe {
-            width: 100% !important;
-            height: 100% !important;
-            margin: 0 auto !important;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            border: none;
         }
 
         .nav-button {
@@ -290,28 +305,7 @@
         </button>
         <span class="nav-button-text prev"></span>
         <div class="viz-container">
-            <div class='tableauPlaceholder' id='viz1745364540836'>
-                <noscript>
-                    <a href='#'>
-                        <img alt=' ' src='https://public.tableau.com/static/images/LU/LUNGevityProjectPRIORITYDashboard/Home/1_rss.png' style='border: none' />
-                    </a>
-                </noscript>
-                <object class='tableauViz' style='display:none;'>
-                    <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
-                    <param name='embed_code_version' value='3' />
-                    <param name='site_root' value='' />
-                    <param name='name' value='LUNGevityProjectPRIORITYDashboard/Home' />
-                    <param name='tabs' value='yes' />
-                    <param name='toolbar' value='yes' />
-                    <param name='static_image' value='https://public.tableau.com/static/images/LU/LUNGevityProjectPRIORITYDashboard/Home/1.png' />
-                    <param name='animate_transition' value='yes' />
-                    <param name='display_static_image' value='yes' />
-                    <param name='display_spinner' value='yes' />
-                    <param name='display_overlay' value='yes' />
-                    <param name='display_count' value='yes' />
-                    <param name='language' value='en-US' />
-                </object>
-            </div>
+            <div id='viz1745364540836'></div>
         </div>
         <button class="nav-button next" aria-label="Next page">
             <svg viewBox="0 0 24 24">
@@ -322,53 +316,29 @@
     </main>
 
     <script type="text/javascript" src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
-    <script src="navigation.js"></script>
+    <script src="app.js"></script>
     <script>
-        let viz;
-        function initViz() {
-            const containerDiv = document.getElementById("viz1745364540836");
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const vizDiv = document.getElementById("viz1745364540836");
             const url = "https://public.tableau.com/views/LUNGevityProjectPRIORITYDashboard/Home";
-            
-            // Set initial options
             const options = {
                 hideTabs: false,
                 hideToolbar: false,
                 width: '100%',
                 height: '100%',
-                device: 'desktop',
                 onFirstInteractive: function() {
-                    handleResize();
+                    console.log("Viz is ready");
+                    if (window.viz) {
+                        ready();
+                    }
                 }
             };
-
-            // Create the viz
-            viz = new tableau.Viz(containerDiv, url, options);
-            
-            // Add resize handler
-            window.addEventListener('resize', debounce(handleResize, 250));
-        }
-
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        function handleResize() {
-            if (!viz) return;
-            const containerDiv = document.getElementById("viz1745364540836");
-            viz.setFrameSize(containerDiv.clientWidth, containerDiv.clientHeight);
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', initViz);
+            const viz = new tableau.Viz(vizDiv, url, options);
+            window.viz = viz;
+        });
     </script>
+    <script src="navigation.js"></script>
 </body>
 </html>
 

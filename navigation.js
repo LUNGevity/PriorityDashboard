@@ -11,26 +11,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextButton = document.querySelector('.nav-button.next');
     const prevButtonText = document.querySelector('.nav-button-text.prev');
     const nextButtonText = document.querySelector('.nav-button-text.next');
-    
-    let viz; // Variable to store the Tableau viz object
 
     // Initialize the Tableau visualization
-    function initializeViz(page = 'Home') {
-        const containerDiv = document.getElementById("viz1745364540836");
+    function navigateToPage(page) {
+        console.log("Navigating to page:", page);
         const url = "https://public.tableau.com/views/LUNGevityProjectPRIORITYDashboard/" + encodeURIComponent(page);
+        
+        if (window.viz) {
+            window.viz.dispose();
+        }
+        
+        const vizDiv = document.getElementById("viz1745364540836");
         const options = {
             hideTabs: false,
             hideToolbar: false,
-            device: window.innerWidth <= 576 ? 'phone' : 'desktop',
+            width: '100%',
             height: '100%',
-            width: '100%'
+            onFirstInteractive: function() {
+                console.log("Viz is ready");
+            }
         };
         
-        if (viz) {
-            viz.dispose();
-        }
-        
-        viz = new tableau.Viz(containerDiv, url, options);
+        window.viz = new tableau.Viz(vizDiv, url, options);
     }
 
     // Get the current page index
@@ -61,28 +63,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Navigate to a specific page index
-    function navigateToPage(index) {
+    function navigateToPageIndex(index) {
+        console.log("Navigating to index:", index);
         const items = Array.from(menuItems);
         if (index >= 0 && index < items.length) {
             items.forEach(i => i.classList.remove('active'));
             items[index].classList.add('active');
             const page = items[index].getAttribute('data-page');
-            initializeViz(page);
+            navigateToPage(page);
             updateNavigationButtonTexts();
         }
     }
 
     // Handle previous button click
     prevButton.addEventListener('click', function() {
+        console.log("Previous button clicked");
         const currentIndex = getCurrentPageIndex();
-        navigateToPage(currentIndex - 1);
+        navigateToPageIndex(currentIndex - 1);
         updateNavigationButtons();
     });
 
     // Handle next button click
     nextButton.addEventListener('click', function() {
+        console.log("Next button clicked");
         const currentIndex = getCurrentPageIndex();
-        navigateToPage(currentIndex + 1);
+        navigateToPageIndex(currentIndex + 1);
         updateNavigationButtons();
     });
 
@@ -107,8 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateNavigationButtonTexts();
     }
 
-    // Initialize the visualization when the page loads
-    initializeViz();
+    // Initialize navigation buttons
     updateNavigationButtons();
 
     // Toggle menu
@@ -139,10 +143,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle menu item clicks
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
+            console.log("Menu item clicked:", this.textContent);
             menuItems.forEach(i => i.classList.remove('active'));
             this.classList.add('active');
             const page = this.getAttribute('data-page');
-            initializeViz(page);
+            navigateToPage(page);
             navMenu.classList.remove('active');
             document.body.style.overflow = '';
             updateNavigationButtons();
@@ -157,9 +162,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
             const currentIndex = getCurrentPageIndex();
             if (e.key === 'ArrowLeft') {
-                navigateToPage(currentIndex - 1);
+                navigateToPageIndex(currentIndex - 1);
             } else {
-                navigateToPage(currentIndex + 1);
+                navigateToPageIndex(currentIndex + 1);
             }
             updateNavigationButtons();
         }
