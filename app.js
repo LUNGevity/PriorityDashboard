@@ -68,26 +68,6 @@ function setupTabSwitchListener() {
   }
 }
 
-// Raw mapping of sheet names to indices and pages
-const rawSheetToIndex = {
-  'Home': { index: 0, page: 'Home' },
-  'Clinical Details': { index: 1, page: 'ClinicalDetails' },
-  'Metastatic Locations': { index: 2, page: 'MetastaticLocations' },
-  'Demographics': { index: 3, page: 'Demographics' },
-  'Diagnostic Story': { index: 4, page: 'DiagnosticStory' },
-  'Biomarker Testing': { index: 5, page: 'BiomarkerTesting' },
-  'Tobacco Exposure': { index: 6, page: 'TobaccoExposure' },
-  'Other Exposures': { index: 7, page: 'OtherExposures' },
-  'Treatment 1and2': { index: 8, page: 'Treatment1and2' },
-  'Treatment3': { index: 9, page: 'Treatment3' },
-  'Treatment4': { index: 10, page: 'Treatment4' },
-  'Side Effects': { index: 11, page: 'SideEffects' },
-  'Clinical Trial': { index: 12, page: 'ClinicalTrial' },
-  'Mental Health': { index: 13, page: 'MentalHealth' },
-  'Care Team Support': { index: 14, page: 'CareTeamSupport' },
-  'FAQ': { index: 15, page: 'FAQ' }
-};
-
 // Function to initialize sheet mapping
 function initializeSheetMapping() {
     console.log("DEBUG: Initializing sheet mapping");
@@ -106,39 +86,10 @@ function initializeSheetMapping() {
         window.sheetToIndex = sheetToIndex;
         window.normalizeSheetName = normalize;
         
-        // Store in sessionStorage for persistence
-        try {
-            sessionStorage.setItem('sheetToIndex', JSON.stringify(sheetToIndex));
-        } catch (e) {
-            console.warn("Could not store sheet mapping in sessionStorage:", e);
-        }
-        
         console.log("DEBUG: Sheet mapping initialized:", sheetToIndex);
     } catch (error) {
         console.error("Error initializing sheet mapping:", error);
     }
-}
-
-// Function to get sheet mapping
-function getSheetMapping() {
-    // Try to get from sessionStorage first
-    try {
-        const stored = sessionStorage.getItem('sheetToIndex');
-        if (stored) {
-            const parsed = JSON.parse(stored);
-            console.log("DEBUG: Retrieved sheet mapping from sessionStorage:", parsed);
-            return parsed;
-        }
-    } catch (e) {
-        console.warn("Could not retrieve sheet mapping from sessionStorage:", e);
-    }
-    
-    // If not in sessionStorage, initialize it
-    if (!window.sheetToIndex) {
-        initializeSheetMapping();
-    }
-    
-    return window.sheetToIndex;
 }
 
 // Function to be called when viz is ready
@@ -204,6 +155,26 @@ function normalize(name) {
     .trim()
     .toLowerCase();          // normalize case
 }
+
+// Raw mapping of sheet names to indices and pages
+const rawSheetToIndex = {
+  'Home': { index: 0, page: 'Home' },
+  'Clinical Details': { index: 1, page: 'ClinicalDetails' },
+  'Metastatic Locations': { index: 2, page: 'MetastaticLocations' },
+  'Demographics': { index: 3, page: 'Demographics' },
+  'Diagnostic Story': { index: 4, page: 'DiagnosticStory' },
+  'Biomarker Testing': { index: 5, page: 'BiomarkerTesting' },
+  'Tobacco Exposure': { index: 6, page: 'TobaccoExposure' },
+  'Other Exposures': { index: 7, page: 'OtherExposures' },
+  'Treatment 1and2': { index: 8, page: 'Treatment1and2' },
+  'Treatment3': { index: 9, page: 'Treatment3' },
+  'Treatment4': { index: 10, page: 'Treatment4' },
+  'Side Effects': { index: 11, page: 'SideEffects' },
+  'Clinical Trial': { index: 12, page: 'ClinicalTrial' },
+  'Mental Health': { index: 13, page: 'MentalHealth' },
+  'Care Team Support': { index: 14, page: 'CareTeamSupport' },
+  'FAQ': { index: 15, page: 'FAQ' }
+};
 
 // Function to find the best matching sheet name
 function findBestMatch(sheetName, sheetNames) {
@@ -284,49 +255,46 @@ function getStandardizedSheetName(sheetName) {
 
 // Function to update navigation state based on sheet name
 function updateNavigationState(sheetName) {
-    console.log("DEBUG: Starting updateNavigationState with sheet name:", sheetName);
-    console.log("DEBUG: Source of navigation:", new Error().stack);
-    
-    // If sheetName is a number, it's already an index
-    if (typeof sheetName === 'number') {
-        console.log("DEBUG: Updating navigation state to index:", sheetName);
-        // Update the navigation state in navigation.js
-        if (window.updateNavigationIndex) {
-            console.log("DEBUG: Calling window.updateNavigationIndex");
-            window.updateNavigationIndex(sheetName);
-        } else {
-            console.error("DEBUG: window.updateNavigationIndex is not defined!");
-        }
-        return;
-    }
-    
-    // Normalize the incoming sheet name
-    const normalizedSheetName = normalize(sheetName);
-    console.log("DEBUG: Normalized sheet name:", normalizedSheetName);
-    
-    // Get the sheet mapping
-    const sheetMapping = getSheetMapping();
-    
-    // Get the index and page from the mapping using normalized name
-    const sheetInfo = sheetMapping[normalizedSheetName];
-    console.log("DEBUG: Mapped sheet info:", sheetInfo);
-    
-    if (sheetInfo) {
-        console.log("DEBUG: Updating navigation state to index:", sheetInfo.index);
-        // Update the navigation state in navigation.js
-        if (window.updateNavigationIndex) {
-            console.log("DEBUG: Calling window.updateNavigationIndex");
-            window.updateNavigationIndex(sheetInfo.index);
-        } else {
-            console.error("DEBUG: window.updateNavigationIndex is not defined!");
-        }
+  console.log("DEBUG: Starting updateNavigationState with sheet name:", sheetName);
+  console.log("DEBUG: Source of navigation:", new Error().stack);
+  
+  // If sheetName is a number, it's already an index
+  if (typeof sheetName === 'number') {
+    console.log("DEBUG: Updating navigation state to index:", sheetName);
+    // Update the navigation state in navigation.js
+    if (window.updateNavigationIndex) {
+      console.log("DEBUG: Calling window.updateNavigationIndex");
+      window.updateNavigationIndex(sheetName);
     } else {
-        console.warn("DEBUG: Unknown sheet name:", sheetName, "(normalized:", normalizedSheetName, ") - Defaulting to Home (index 0)");
-        // Default to Home if sheet name is unknown
-        if (window.updateNavigationIndex) {
-            window.updateNavigationIndex(0);
-        }
+      console.error("DEBUG: window.updateNavigationIndex is not defined!");
     }
+    return;
+  }
+  
+  // Normalize the incoming sheet name
+  const normalizedSheetName = normalize(sheetName);
+  console.log("DEBUG: Normalized sheet name:", normalizedSheetName);
+  
+  // Get the index and page from the mapping using normalized name
+  const sheetInfo = sheetToIndex[normalizedSheetName];
+  console.log("DEBUG: Mapped sheet info:", sheetInfo);
+  
+  if (sheetInfo) {
+    console.log("DEBUG: Updating navigation state to index:", sheetInfo.index);
+    // Update the navigation state in navigation.js
+    if (window.updateNavigationIndex) {
+      console.log("DEBUG: Calling window.updateNavigationIndex");
+      window.updateNavigationIndex(sheetInfo.index);
+    } else {
+      console.error("DEBUG: window.updateNavigationIndex is not defined!");
+    }
+  } else {
+    console.warn("DEBUG: Unknown sheet name:", sheetName, "(normalized:", normalizedSheetName, ") - Defaulting to Home (index 0)");
+    // Default to Home if sheet name is unknown
+    if (window.updateNavigationIndex) {
+      window.updateNavigationIndex(0);
+    }
+  }
 }
 
 // Function to check current sheet
@@ -560,6 +528,5 @@ window.setupTabSwitchListener = setupTabSwitchListener;
 
 // Make initializeSheetMapping available globally
 window.initializeSheetMapping = initializeSheetMapping;
-window.getSheetMapping = getSheetMapping;
 
 

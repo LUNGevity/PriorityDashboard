@@ -1,6 +1,55 @@
 # LUNGevity Project PRIORITY Dashboard
 
-This repository contains the web interface for the LUNGevity Project PRIORITY Dashboard, which presents the results of an online survey completed in 2019 by people living with EGFR lung cancer. The dashboard provides insights into the treatment experiences of EGFR-positive lung cancer patients.
+## Overview
+This dashboard provides an interactive visualization of lung cancer patient data, allowing users to explore various aspects of patient demographics, clinical details, and treatment outcomes.
+
+## Navigation Guide
+
+### Menu Navigation
+- Use the menu icon in the top-left corner to access the full navigation menu
+- Click on any menu item to navigate directly to that section
+- The menu can be closed by clicking the X button or clicking outside the menu
+
+### Arrow Navigation
+- Use the left and right arrows at the bottom of the screen to move between sections sequentially
+- The arrows will show the name of the next/previous section
+- Navigation is disabled (arrows hidden) when at the first or last section
+
+### Tab Navigation
+- Within each section, you can use the tabs at the top of the visualization to switch between different views
+- The navigation state will automatically update to reflect the current tab
+
+### Keyboard Navigation
+- Use the left and right arrow keys to navigate between sections
+- Press ESC to close the menu if it's open
+
+### Responsive Design
+- The dashboard automatically adjusts to different screen sizes
+- On mobile devices, the visualization will switch to a mobile-optimized view
+- The navigation menu becomes a slide-out panel on mobile devices
+
+## Sections
+1. Home - Overview and introduction
+2. Clinical Details - Patient clinical information
+3. Metastatic Locations - Details about cancer spread
+4. Demographics - Patient demographic data
+5. Diagnostic Story - Patient diagnosis journey
+6. Biomarker Testing - Results of biomarker tests
+7. Tobacco Exposure - Smoking history and exposure
+8. Other Risk Factors and Exposures - Additional risk factors
+9. Treatment for Those Diagnosed with Stage I/II - Early stage treatment details
+10. Treatment for Those Diagnosed with Stage III - Stage III treatment information
+11. Treatment for Those Diagnosed with Stage IV - Stage IV treatment details
+12. Side Effects - Treatment side effects
+13. Experience with Clinical Trial - Clinical trial participation
+14. Mental Health - Mental health aspects
+15. Care Team Support - Support team information
+16. FAQ - Frequently asked questions
+
+## Technical Details
+- Built using Tableau
+- Responsive design for desktop and mobile viewing
+- Optimized for modern web browsers
 
 ## Features
 
@@ -8,14 +57,6 @@ This repository contains the web interface for the LUNGevity Project PRIORITY Da
 - Responsive design that works across different screen sizes
 - Navigation menu with easy access to different sections
 - Previous/Next navigation buttons for sequential browsing
-
-## Technical Details
-
-The dashboard is built using:
-- HTML5
-- CSS3
-- JavaScript
-- Tableau Public API
 
 ## Setup
 
