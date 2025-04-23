@@ -21,6 +21,77 @@ function debounce(func, wait) {
   };
 }
 
+// Function to set up tab switch event listener
+function setupTabSwitchListener() {
+  console.log("Setting up tab switch listener");
+  if (!window.viz) {
+    console.error("Viz not initialized!");
+    return;
+  }
+
+  try {
+    // Remove any existing listeners first
+    window.viz.removeEventListener('tabswitch');
+    
+    // Add tab switch listener
+    window.viz.addEventListener('tabswitch', function(event) {
+      console.log("Tab switch event:", event);
+      try {
+        const oldSheetName = event.getOldSheetName();
+        const newSheetName = event.getNewSheetName();
+        console.log("Switched from sheet:", oldSheetName, "to sheet:", newSheetName);
+        
+        // Get the normalized sheet name and info
+        const normalizedSheetName = normalize(newSheetName);
+        const sheetInfo = sheetToIndex[normalizedSheetName];
+        
+        if (sheetInfo) {
+          console.log("DEBUG: Found sheet info for tab switch:", sheetInfo);
+          // Update navigation state with the original sheet name
+          updateNavigationState(sheetInfo.originalName);
+          
+          // Trigger resize handling after a short delay
+          setTimeout(() => {
+            if (window.handleResize) {
+              window.handleResize();
+            }
+          }, 100);
+        } else {
+          console.warn("DEBUG: Unknown sheet name in tab switch:", newSheetName);
+        }
+      } catch (error) {
+        console.error("Error handling tab switch:", error);
+      }
+    });
+  } catch (error) {
+    console.error("Error setting up tab switch listener:", error);
+  }
+}
+
+// Function to initialize sheet mapping
+function initializeSheetMapping() {
+    console.log("DEBUG: Initializing sheet mapping");
+    try {
+        // Build normalized mapping once at startup
+        const sheetToIndex = {};
+        Object.entries(rawSheetToIndex).forEach(([originalName, info]) => {
+            const normalizedName = normalize(originalName);
+            sheetToIndex[normalizedName] = {
+                ...info,
+                originalName // Store the original name for Tableau navigation
+            };
+        });
+
+        // Make the mapping available globally
+        window.sheetToIndex = sheetToIndex;
+        window.normalizeSheetName = normalize;
+        
+        console.log("DEBUG: Sheet mapping initialized:", sheetToIndex);
+    } catch (error) {
+        console.error("Error initializing sheet mapping:", error);
+    }
+}
+
 // Function to be called when viz is ready
 function ready() {
   console.log("Viz is ready, checking sheet type");
@@ -30,6 +101,11 @@ function ready() {
   }
 
   try {
+    // Initialize sheet mapping if not already done
+    if (!window.sheetToIndex) {
+      initializeSheetMapping();
+    }
+
     // Get the container
     vizDiv = document.getElementById("viz1745364540836");
     if (!vizDiv) {
@@ -44,7 +120,7 @@ function ready() {
     console.log("Sheet type:", activeSheet.getSheetType());
 
     // Set up media query
-      mediaQuery = window.matchMedia(mediaQueryString);
+    mediaQuery = window.matchMedia(mediaQueryString);
     
     // Initial sizing and scaling
     handleResize();
@@ -52,18 +128,8 @@ function ready() {
     // Add resize listener
     window.addEventListener('resize', debounce(handleResize, 250));
 
-    // Add tab switch listener
-    window.viz.addEventListener('tabswitch', function(event) {
-      console.log("Tab switch event:", event);
-      try {
-        const oldSheetName = event.getOldSheetName();
-        const newSheetName = event.getNewSheetName();
-        console.log("Switched from sheet:", oldSheetName, "to sheet:", newSheetName);
-        updateNavigationState(newSheetName);
-      } catch (error) {
-        console.error("Error handling tab switch:", error);
-      }
-    });
+    // Set up tab switch listener
+    setupTabSwitchListener();
 
     // Check initial sheet
     checkCurrentSheet();
@@ -109,20 +175,6 @@ const rawSheetToIndex = {
   'Care Team Support': { index: 14, page: 'CareTeamSupport' },
   'FAQ': { index: 15, page: 'FAQ' }
 };
-
-// Build normalized mapping once at startup
-const sheetToIndex = {};
-Object.entries(rawSheetToIndex).forEach(([originalName, info]) => {
-  const normalizedName = normalize(originalName);
-  sheetToIndex[normalizedName] = {
-    ...info,
-    originalName // Store the original name for Tableau navigation
-  };
-});
-
-// Make the mapping available globally
-window.sheetToIndex = sheetToIndex;
-window.normalizeSheetName = normalize;
 
 // Function to find the best matching sheet name
 function findBestMatch(sheetName, sheetNames) {
@@ -460,7 +512,7 @@ function navigateToSheet(sheetName) {
       }).catch(error => {
         console.error("DEBUG: Error activating sheet:", error);
       });
-    } else {
+      } else {
       console.error("DEBUG: Viz not initialized!");
     }
   } else {
@@ -470,5 +522,11 @@ function navigateToSheet(sheetName) {
 
 // Make the navigation functions available globally
 window.navigateToSheet = navigateToSheet;
+
+// Make setupTabSwitchListener available globally
+window.setupTabSwitchListener = setupTabSwitchListener;
+
+// Make initializeSheetMapping available globally
+window.initializeSheetMapping = initializeSheetMapping;
 
 

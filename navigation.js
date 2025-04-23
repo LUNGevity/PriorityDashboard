@@ -35,14 +35,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     const currentSheet = workbook.getActiveSheet();
                     const sheetName = currentSheet.getName();
                     console.log("Current sheet after navigation:", sheetName);
-                    updateNavigationState(sheetName);
                     
-                    // Trigger resize handling after a short delay to ensure viz is fully rendered
+                    // Get the normalized sheet name and info
+                    const normalizedSheetName = window.normalizeSheetName(sheetName);
+                    const sheetInfo = window.sheetToIndex[normalizedSheetName];
+                    
+                    if (sheetInfo) {
+                        console.log("DEBUG: Found sheet info for menu navigation:", sheetInfo);
+                        // Update navigation state with the original sheet name
+                        updateNavigationState(sheetInfo.originalName);
+                    } else {
+                        console.warn("DEBUG: Unknown sheet name in menu navigation:", sheetName);
+                        updateNavigationState(sheetName);
+                    }
+                    
+                    // Set up tab switch listener after menu navigation
+                    if (window.setupTabSwitchListener) {
+                        window.setupTabSwitchListener();
+                    } else {
+                        console.warn("setupTabSwitchListener function not found");
+                    }
+                    
+                    // Trigger resize handling after a short delay
                     setTimeout(() => {
                         if (window.handleResize) {
                             window.handleResize();
-                        } else {
-                            console.warn("handleResize function not found");
                         }
                     }, 100);
                 }
@@ -61,21 +78,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Update navigation button texts
     function updateNavigationButtonTexts() {
+        console.log("DEBUG: Updating navigation button texts");
         const currentIndex = getCurrentPageIndex();
         const items = Array.from(menuItems);
         
-        // Update previous button text
-        if (currentIndex > 0) {
-            prevButtonText.textContent = items[currentIndex - 1].textContent;
-        } else {
-            prevButtonText.textContent = '';
-        }
-        
-        // Update next button text
-        if (currentIndex < items.length - 1) {
-            nextButtonText.textContent = items[currentIndex + 1].textContent;
-        } else {
-            nextButtonText.textContent = '';
+        try {
+            // Get sheet info for the current index
+            const currentSheetInfo = Object.values(window.sheetToIndex).find(info => info.index === currentIndex);
+            console.log("DEBUG: Current sheet info:", currentSheetInfo);
+            
+            // Update previous button text
+            if (currentIndex > 0) {
+                const prevSheetInfo = Object.values(window.sheetToIndex).find(info => info.index === currentIndex - 1);
+                console.log("DEBUG: Previous sheet info:", prevSheetInfo);
+                if (prevSheetInfo) {
+                    prevButtonText.textContent = prevSheetInfo.originalName;
+                } else {
+                    console.warn("DEBUG: No sheet info found for previous index:", currentIndex - 1);
+                    prevButtonText.textContent = items[currentIndex - 1].textContent;
+                }
+            } else {
+                prevButtonText.textContent = '';
+            }
+            
+            // Update next button text
+            if (currentIndex < items.length - 1) {
+                const nextSheetInfo = Object.values(window.sheetToIndex).find(info => info.index === currentIndex + 1);
+                console.log("DEBUG: Next sheet info:", nextSheetInfo);
+                if (nextSheetInfo) {
+                    nextButtonText.textContent = nextSheetInfo.originalName;
+                } else {
+                    console.warn("DEBUG: No sheet info found for next index:", currentIndex + 1);
+                    nextButtonText.textContent = items[currentIndex + 1].textContent;
+                }
+            } else {
+                nextButtonText.textContent = '';
+            }
+        } catch (error) {
+            console.error("Error updating navigation button texts:", error);
+            // Fallback to using menu item texts
+            if (currentIndex > 0) {
+                prevButtonText.textContent = items[currentIndex - 1].textContent;
+            } else {
+                prevButtonText.textContent = '';
+            }
+            
+            if (currentIndex < items.length - 1) {
+                nextButtonText.textContent = items[currentIndex + 1].textContent;
+            } else {
+                nextButtonText.textContent = '';
+            }
         }
     }
 
@@ -218,14 +270,21 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("DEBUG: Starting updateNavigationIndex with index:", index);
         console.log("DEBUG: Source of navigation:", new Error().stack);
         
-        // Update the active menu item
-        menuItems.forEach(i => i.classList.remove('active'));
-        menuItems[index].classList.add('active');
-        
-        // Update navigation buttons
-        updateNavigationButtons();
-        
-        console.log("DEBUG: Navigation state updated to index:", index);
+        try {
+            // Update the active menu item
+            menuItems.forEach(i => i.classList.remove('active'));
+            menuItems[index].classList.add('active');
+            
+            // Update navigation buttons
+            updateNavigationButtons();
+            
+            // Update button texts
+            updateNavigationButtonTexts();
+            
+            console.log("DEBUG: Navigation state updated to index:", index);
+        } catch (error) {
+            console.error("Error updating navigation index:", error);
+        }
     }
 
     // Make updateNavigationIndex available globally
