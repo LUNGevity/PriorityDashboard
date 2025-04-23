@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUNGevity Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            width: 100%;
+            height: 60px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-icon {
+            width: 30px;
+            height: 21px;
+            cursor: pointer;
+            margin-left: 25px;
+            position: relative;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: #003865;
+            border-radius: 3px;
+            transition: transform 0.3s ease;
+        }
+
+        .close-button {
+            display: none;
+            font-size: 30px;
+            color: #003865;
+            line-height: 21px;
+            text-align: center;
+        }
+
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background-color: white;
+            transition: transform 0.3s ease;
+            z-index: 999;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-menu.active {
+            transform: translateX(300px);
+        }
+
+        .nav-menu.active .close-button {
+            display: block;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        .nav-menu.active .hamburger {
+            display: none;
+        }
+
+        .nav-menu-list {
+            list-style: none;
+            padding: 80px 0 0 0;
+            margin: 0;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .nav-menu-item {
+            padding: 15px 20px 15px 35px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            color: #003865;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+
+        .nav-menu-item:hover {
+            background-color: rgba(0, 56, 101, 0.1);
+        }
+
+        .nav-menu-item.active {
+            background-color: rgba(0, 56, 101, 0.1);
+            font-weight: 500;
+        }
+
+        .main-content {
+            margin-top: 60px;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+        }
+
+        .viz-container {
+            width: 85%;
+            max-width: 1600px;
+            height: calc(95vh - 60px) !important;
+            position: relative;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .nav-button {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: transparent;
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .nav-button:hover {
+            background-color: rgba(0, 56, 101, 0.1);
+        }
+
+        .nav-button.prev {
+            left: 40px;
+        }
+
+        .nav-button.next {
+            right: 40px;
+        }
+
+        .nav-button svg {
+            width: 24px;
+            height: 24px;
+            fill: #003865;
+        }
+
+        .nav-button-text {
+            position: fixed;
+            font-size: 12px;
+            color: #003865;
+            text-align: center;
+            width: 100px;
+            word-wrap: break-word;
+            line-height: 1.2;
+            z-index: 99;
+        }
+
+        .nav-button-text.prev {
+            left: 10px;
+            top: calc(50% + 25px);
+        }
+
+        .nav-button-text.next {
+            right: 10px;
+            top: calc(50% + 25px);
+        }
+
+        #viz1745364540836 {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Center Tableau elements */
+        .tableauPlaceholder {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 auto !important;
+        }
+
+        .tableauViz {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        iframe {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 auto !important;
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 10px;
+            }
+            
+            .viz-container {
+                width: 95%;
+                height: calc(85vh - 60px) !important;
+                padding: 0;
+            }
+
+            .nav-button {
+                width: 32px;
+                height: 32px;
+                padding: 6px;
+            }
+
+            .nav-button.prev {
+                left: 20px;
+            }
+
+            .nav-button.next {
+                right: 20px;
+            }
+
+            .nav-button svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .nav-button-text {
+                font-size: 10px;
+                width: 80px;
+            }
+
+            .nav-button-text.prev {
+                left: 0px;
+            }
+
+            .nav-button-text.next {
+                right: 0px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="menu-icon">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="close-button">×</div>
+        </div>
+    </header>
+
+    <div class="nav-menu">
+        <ul class="nav-menu-list">
+            <li class="nav-menu-item active" data-page="Home">Home</li>
+            <li class="nav-menu-item" data-page="ClinicalDetails">Clinical Details</li>
+            <li class="nav-menu-item" data-page="MetastaticLocations">Location Where Cancer Has Spread</li>
+            <li class="nav-menu-item" data-page="Demographics">Who Was in the Study</li>
+            <li class="nav-menu-item" data-page="DiagnosticStory">Diagnostic Story</li>
+            <li class="nav-menu-item" data-page="BiomarkerTesting">Biomarker Testing at Diagnosis</li>
+            <li class="nav-menu-item" data-page="TobaccoExposure">Tobacco Exposure</li>
+            <li class="nav-menu-item" data-page="OtherExposures">Other Risk Factors and Exposures</li>
+            <li class="nav-menu-item" data-page="Treatment1and2">Treatment for Those Diagnosed with Stage I/II</li>
+            <li class="nav-menu-item" data-page="Treatment3">Treatment for Those Diagnosed with Stage III</li>
+            <li class="nav-menu-item" data-page="Treatment4">Treatment for Those Diagnosed with Stage IV</li>
+            <li class="nav-menu-item" data-page="SideEffects">Side Effects</li>
+            <li class="nav-menu-item" data-page="ClinicalTrial">Experience with Clinical Trial</li>
+            <li class="nav-menu-item" data-page="MentalHealth">Mental Health & Social Support</li>
+            <li class="nav-menu-item" data-page="CareTeamSupport">Care Team Support</li>
+            <li class="nav-menu-item" data-page="FAQ">FAQ</li>
+        </ul>
+    </div>
+
+    <main class="main-content">
+        <button class="nav-button prev" aria-label="Previous page">
+            <svg viewBox="0 0 24 24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
+        </button>
+        <span class="nav-button-text prev"></span>
+        <div class="viz-container">
+            <div class='tableauPlaceholder' id='viz1745364540836'>
+                <noscript>
+                    <a href='#'>
+                        <img alt=' ' src='https://public.tableau.com/static/images/LU/LUNGevityProjectPRIORITYDashboard/Home/1_rss.png' style='border: none' />
+                    </a>
+                </noscript>
+                <object class='tableauViz' style='display:none;'>
+                    <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+                    <param name='embed_code_version' value='3' />
+                    <param name='site_root' value='' />
+                    <param name='name' value='LUNGevityProjectPRIORITYDashboard/Home' />
+                    <param name='tabs' value='yes' />
+                    <param name='toolbar' value='yes' />
+                    <param name='static_image' value='https://public.tableau.com/static/images/LU/LUNGevityProjectPRIORITYDashboard/Home/1.png' />
+                    <param name='animate_transition' value='yes' />
+                    <param name='display_static_image' value='yes' />
+                    <param name='display_spinner' value='yes' />
+                    <param name='display_overlay' value='yes' />
+                    <param name='display_count' value='yes' />
+                    <param name='language' value='en-US' />
+                </object>
+            </div>
+        </div>
+        <button class="nav-button next" aria-label="Next page">
+            <svg viewBox="0 0 24 24">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+            </svg>
+        </button>
+        <span class="nav-button-text next"></span>
+    </main>
+
+    <script type="text/javascript" src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+    <script src="navigation.js"></script>
+    <script type="module">
+        import { TableauEventType } from 'https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js';
+
+        let viz;
+        function initViz() {
+            const containerDiv = document.getElementById("viz1745364540836");
+            const url = "https://public.tableau.com/views/LUNGevityProjectPRIORITYDashboard/Home";
+            
+            // Set initial options
+            const options = {
+                hideTabs: false,
+                hideToolbar: false,
+                width: '100%',
+                height: '100%',
+                device: 'desktop',
+                onFirstInteractive: function() {
+                    handleResize();
+                }
+            };
+
+            // Create the viz
+            viz = new tableau.Viz(containerDiv, url, options);
+            
+            // Add resize handler
+            window.addEventListener('resize', debounce(handleResize, 250));
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function handleResize() {
+            if (!viz) return;
+
+            const containerDiv = document.getElementById("viz1745364540836");
+            const workbook = viz.getWorkbook();
+            
+            if (workbook) {
+                const sheet = workbook.getActiveSheet();
+                
+                // Get container dimensions
+                const containerWidth = containerDiv.clientWidth;
+                const containerHeight = containerDiv.clientHeight;
+
+                // Adjust the frame size
+                viz.setFrameSize(containerWidth, containerHeight);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initViz);
+    </script>
+</body>
+</html>
+
+
+
+
+
+
