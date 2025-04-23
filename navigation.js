@@ -83,13 +83,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const items = Array.from(menuItems);
         
         try {
+            // Get sheet mapping
+            const sheetMapping = window.getSheetMapping();
+            if (!sheetMapping) {
+                console.warn("DEBUG: No sheet mapping available");
+                return;
+            }
+            
             // Get sheet info for the current index
-            const currentSheetInfo = Object.values(window.sheetToIndex).find(info => info.index === currentIndex);
+            const currentSheetInfo = Object.values(sheetMapping).find(info => info.index === currentIndex);
             console.log("DEBUG: Current sheet info:", currentSheetInfo);
             
             // Update previous button text
             if (currentIndex > 0) {
-                const prevSheetInfo = Object.values(window.sheetToIndex).find(info => info.index === currentIndex - 1);
+                const prevSheetInfo = Object.values(sheetMapping).find(info => info.index === currentIndex - 1);
                 console.log("DEBUG: Previous sheet info:", prevSheetInfo);
                 if (prevSheetInfo) {
                     prevButtonText.textContent = prevSheetInfo.originalName;
@@ -103,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Update next button text
             if (currentIndex < items.length - 1) {
-                const nextSheetInfo = Object.values(window.sheetToIndex).find(info => info.index === currentIndex + 1);
+                const nextSheetInfo = Object.values(sheetMapping).find(info => info.index === currentIndex + 1);
                 console.log("DEBUG: Next sheet info:", nextSheetInfo);
                 if (nextSheetInfo) {
                     nextButtonText.textContent = nextSheetInfo.originalName;
@@ -248,19 +255,32 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("DEBUG: Starting updateNavigationState with sheet name:", sheetName);
         console.log("DEBUG: Source of navigation:", new Error().stack);
         
-        // Use the global mapping and normalization function
-        const normalizedSheetName = window.normalizeSheetName(sheetName);
-        const sheetInfo = window.sheetToIndex[normalizedSheetName];
-        
-        console.log("Mapped sheet to index:", sheetInfo?.index);
-        
-        if (sheetInfo) {
-            console.log("Updating navigation state to index:", sheetInfo.index);
-            // Update the navigation state
-            updateNavigationIndex(sheetInfo.index);
-        } else {
-            console.warn("No index found for sheet:", sheetName);
-            // Default to Home if sheet name is unknown
+        try {
+            // Get sheet mapping
+            const sheetMapping = window.getSheetMapping();
+            if (!sheetMapping) {
+                console.warn("DEBUG: No sheet mapping available");
+                return;
+            }
+            
+            // Use the global mapping and normalization function
+            const normalizedSheetName = window.normalizeSheetName(sheetName);
+            const sheetInfo = sheetMapping[normalizedSheetName];
+            
+            console.log("Mapped sheet to index:", sheetInfo?.index);
+            
+            if (sheetInfo) {
+                console.log("Updating navigation state to index:", sheetInfo.index);
+                // Update the navigation state
+                updateNavigationIndex(sheetInfo.index);
+            } else {
+                console.warn("No index found for sheet:", sheetName);
+                // Default to Home if sheet name is unknown
+                updateNavigationIndex(0);
+            }
+        } catch (error) {
+            console.error("Error updating navigation state:", error);
+            // Default to Home on error
             updateNavigationIndex(0);
         }
     }
