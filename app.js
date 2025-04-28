@@ -245,7 +245,7 @@ function getStandardizedSheetName(sheetName) {
   const sheetNameMap = {
     'Treatment4': 'Treatment for Those Diagnosed with Stage IV',
     'Treatment3': 'Treatment for Those Diagnosed with Stage III',
-    'Treatment2': 'Treatment for Those Diagnosed with Stage I/II',
+    'Treatment1and2': 'Treatment for Those Diagnosed with Stage I/II',
     'Biomarker Testing': 'Biomarker Testing at Diagnosis',
     'Clinical Trial': 'Experience with Clinical Trial'
   };
@@ -404,8 +404,8 @@ function scaleViz(currentWidth, deviceType) {
         const containerHeight = window.innerHeight * 0.85;
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
-        const dashboardWidth = 1366;
-        const dashboardHeight = 795;
+        const dashboardWidth = 1440;
+        const dashboardHeight = 810;
         
         console.log("Dimensions:", {
             window: {
