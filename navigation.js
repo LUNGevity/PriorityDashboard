@@ -1,6 +1,6 @@
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded');
+    // console.log('DOM Content Loaded');
     
     // Get all the necessary elements
     const menuIcon = document.querySelector('.menu-icon');
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize the Tableau visualization
     function navigateToPage(page) {
-        console.log("Navigating to page:", page);
+        // console.log("Navigating to page:", page);
         const url = "https://public.tableau.com/views/LUNGevityProjectPRIORITYDashboard/" + encodeURIComponent(page);
         
         if (window.viz) {
@@ -28,24 +28,24 @@ document.addEventListener('DOMContentLoaded', function() {
             width: '100%',
             height: '100%',
             onFirstInteractive: function() {
-                console.log("Viz is ready");
+                // console.log("Viz is ready");
                 // Get the current sheet name and update navigation
                 if (window.viz) {
                     const workbook = window.viz.getWorkbook();
                     const currentSheet = workbook.getActiveSheet();
                     const sheetName = currentSheet.getName();
-                    console.log("Current sheet after navigation:", sheetName);
+                    // console.log("Current sheet after navigation:", sheetName);
                     
                     // Get the normalized sheet name and info
                     const normalizedSheetName = window.normalizeSheetName(sheetName);
                     const sheetInfo = window.sheetToIndex[normalizedSheetName];
                     
                     if (sheetInfo) {
-                        console.log("DEBUG: Found sheet info for menu navigation:", sheetInfo);
+                        // console.log("DEBUG: Found sheet info for menu navigation:", sheetInfo);
                         // Update navigation state with the original sheet name
                         updateNavigationState(sheetInfo.originalName);
                     } else {
-                        console.warn("DEBUG: Unknown sheet name in menu navigation:", sheetName);
+                        // console.warn("DEBUG: Unknown sheet name in menu navigation:", sheetName);
                         updateNavigationState(sheetName);
                     }
                     
@@ -78,24 +78,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Update navigation button texts
     function updateNavigationButtonTexts() {
-        console.log("DEBUG: Updating navigation button texts");
+        // console.log("DEBUG: Updating navigation button texts");
         const currentIndex = getCurrentPageIndex();
         const items = Array.from(menuItems);
         
         try {
             // Get sheet info for the current index
             const currentSheetInfo = Object.values(window.sheetToIndex).find(info => info.index === currentIndex);
-            console.log("DEBUG: Current sheet info:", currentSheetInfo);
+            // console.log("DEBUG: Current sheet info:", currentSheetInfo);
             
             // Update previous button text
             if (currentIndex > 0) {
                 const prevSheetInfo = Object.values(window.sheetToIndex).find(info => info.index === currentIndex - 1);
-                console.log("DEBUG: Previous sheet info:", prevSheetInfo);
+                // console.log("DEBUG: Previous sheet info:", prevSheetInfo);
                 if (prevSheetInfo) {
                     // Use the long form name from the menu item
                     prevButtonText.textContent = items[currentIndex - 1].textContent;
                 } else {
-                    console.warn("DEBUG: No sheet info found for previous index:", currentIndex - 1);
+                    // console.warn("DEBUG: No sheet info found for previous index:", currentIndex - 1);
                     prevButtonText.textContent = items[currentIndex - 1].textContent;
                 }
             } else {
@@ -105,12 +105,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update next button text
             if (currentIndex < items.length - 1) {
                 const nextSheetInfo = Object.values(window.sheetToIndex).find(info => info.index === currentIndex + 1);
-                console.log("DEBUG: Next sheet info:", nextSheetInfo);
+                // console.log("DEBUG: Next sheet info:", nextSheetInfo);
                 if (nextSheetInfo) {
                     // Use the long form name from the menu item
                     nextButtonText.textContent = items[currentIndex + 1].textContent;
                 } else {
-                    console.warn("DEBUG: No sheet info found for next index:", currentIndex + 1);
+                    // console.warn("DEBUG: No sheet info found for next index:", currentIndex + 1);
                     nextButtonText.textContent = items[currentIndex + 1].textContent;
                 }
             } else {
@@ -135,24 +135,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Navigate to a specific page index
     function navigateToPageIndex(index) {
-        console.log("DEBUG: Navigating to index:", index);
+        // console.log("DEBUG: Navigating to index:", index);
         const items = Array.from(menuItems);
         if (index >= 0 && index < items.length) {
             // Get the sheet name from the mapping
             const sheetInfo = Object.values(window.sheetToIndex).find(info => info.index === index);
             if (sheetInfo) {
-                console.log("DEBUG: Found sheet info for index:", sheetInfo);
+                // console.log("DEBUG: Found sheet info for index:", sheetInfo);
                 // Use the global navigation function with the original sheet name
                 window.navigateToSheet(sheetInfo.originalName);
             } else {
-                console.warn("DEBUG: No sheet info found for index:", index);
+                // console.warn("DEBUG: No sheet info found for index:", index);
             }
         }
     }
 
     // Handle previous button click
     prevButton.addEventListener('click', function() {
-        console.log("Previous button clicked");
+        // console.log("Previous button clicked");
         const currentIndex = getCurrentPageIndex();
         navigateToPageIndex(currentIndex - 1);
         updateNavigationButtons();
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle next button click
     nextButton.addEventListener('click', function() {
-        console.log("Next button clicked");
+        // console.log("Next button clicked");
         const currentIndex = getCurrentPageIndex();
         navigateToPageIndex(currentIndex + 1);
         updateNavigationButtons();
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle menu item clicks
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
-            console.log("Menu item clicked:", this.textContent);
+            // console.log("Menu item clicked:", this.textContent);
             menuItems.forEach(i => i.classList.remove('active'));
             this.classList.add('active');
             const page = this.getAttribute('data-page');
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to update navigation state based on sheet name
     function updateNavigationState(sheetName) {
-        console.log("DEBUG: Starting updateNavigationState with sheet name:", sheetName);
+        // console.log("DEBUG: Starting updateNavigationState with sheet name:", sheetName);
         console.log("DEBUG: Source of navigation:", new Error().stack);
         
         // Use the global mapping and normalization function

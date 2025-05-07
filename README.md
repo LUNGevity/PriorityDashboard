@@ -11,7 +11,7 @@ This dashboard provides an interactive visualization of lung cancer patient data
 - The menu can be closed by clicking the X button or clicking outside the menu
 
 ### Arrow Navigation
-- Use the left and right arrows at the bottom of the screen to move between sections sequentially
+- Use the left and right arrows on the sides of the screen to move between sections sequentially
 - The arrows will show the name of the next/previous section
 - Navigation is disabled (arrows hidden) when at the first or last section
 
@@ -27,6 +27,7 @@ This dashboard provides an interactive visualization of lung cancer patient data
 - The dashboard automatically adjusts to different screen sizes
 - On mobile devices, the visualization will switch to a mobile-optimized view
 - The navigation menu becomes a slide-out panel on mobile devices
+- Navigation buttons and text are optimized for both desktop and mobile views
 
 ## Sections
 1. Home - Overview and introduction
@@ -47,8 +48,9 @@ This dashboard provides an interactive visualization of lung cancer patient data
 16. FAQ - Frequently asked questions
 
 ## Technical Details
-- Built using Tableau
-- Responsive design for desktop and mobile viewing
+- Built using Tableau for data visualization
+- Responsive design optimized for both desktop and mobile viewing
+- Modern, clean interface with intuitive navigation
 - Optimized for modern web browsers
 
 ## Features
@@ -62,12 +64,12 @@ This dashboard provides an interactive visualization of lung cancer patient data
 
 1. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone https://github.com/LUNGevity/PriorityDashboard.git
 ```
 
 2. Open the project directory:
 ```bash
-cd lungevity-priority-dashboard
+cd PriorityDashboard
 ```
 
 3. Serve the files using a local web server. For example, using Python:
@@ -80,10 +82,18 @@ python -m http.server 8000
 
 ## Structure
 
-- `index.html` - Main HTML file containing the dashboard structure
+- `index.html` - Main HTML file containing the dashboard structure and styles
 - `navigation.js` - JavaScript file handling navigation and Tableau visualization
 - `README.md` - Project documentation
 - `.gitignore` - Git ignore file
+
+## Recent Updates
+
+- Optimized dashboard size for maximum visibility
+- Improved navigation button and text positioning
+- Enhanced mobile responsiveness
+- Cleaned up and optimized CSS code
+- Improved overall layout and spacing
 
 ## License
 

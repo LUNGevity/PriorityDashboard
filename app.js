@@ -23,54 +23,54 @@ function debounce(func, wait) {
 
 // Function to set up tab switch event listener
 function setupTabSwitchListener() {
-  console.log("Setting up tab switch listener");
-  if (!window.viz) {
-    console.error("Viz not initialized!");
-    return;
-  }
+    // console.log("Setting up tab switch listener");
+    if (!window.viz) {
+        console.error("Viz not initialized!");
+        return;
+    }
 
-  try {
-    // Remove any existing listeners first
-    window.viz.removeEventListener('tabswitch');
-    
-    // Add tab switch listener
-    window.viz.addEventListener('tabswitch', function(event) {
-      console.log("Tab switch event:", event);
-      try {
-        const oldSheetName = event.getOldSheetName();
-        const newSheetName = event.getNewSheetName();
-        console.log("Switched from sheet:", oldSheetName, "to sheet:", newSheetName);
+    try {
+        // Remove any existing listeners first
+        window.viz.removeEventListener('tabswitch');
         
-        // Get the normalized sheet name and info
-        const normalizedSheetName = normalize(newSheetName);
-        const sheetInfo = sheetToIndex[normalizedSheetName];
-        
-        if (sheetInfo) {
-          console.log("DEBUG: Found sheet info for tab switch:", sheetInfo);
-          // Update navigation state with the original sheet name
-          updateNavigationState(sheetInfo.originalName);
-          
-          // Trigger resize handling after a short delay
-          setTimeout(() => {
-            if (window.handleResize) {
-              window.handleResize();
+        // Add tab switch listener
+        window.viz.addEventListener('tabswitch', function(event) {
+            // console.log("Tab switch event:", event);
+            try {
+                const oldSheetName = event.getOldSheetName();
+                const newSheetName = event.getNewSheetName();
+                // console.log("Switched from sheet:", oldSheetName, "to sheet:", newSheetName);
+                
+                // Get the normalized sheet name and info
+                const normalizedSheetName = normalize(newSheetName);
+                const sheetInfo = sheetToIndex[normalizedSheetName];
+                
+                if (sheetInfo) {
+                    // console.log("DEBUG: Found sheet info for tab switch:", sheetInfo);
+                    // Update navigation state with the original sheet name
+                    updateNavigationState(sheetInfo.originalName);
+                    
+                    // Trigger resize handling after a short delay
+                    setTimeout(() => {
+                        if (window.handleResize) {
+                            window.handleResize();
+                        }
+                    }, 100);
+                } else {
+                    // console.warn("DEBUG: Unknown sheet name in tab switch:", newSheetName);
+                }
+            } catch (error) {
+                console.error("Error handling tab switch:", error);
             }
-          }, 100);
-        } else {
-          console.warn("DEBUG: Unknown sheet name in tab switch:", newSheetName);
-        }
-      } catch (error) {
-        console.error("Error handling tab switch:", error);
-      }
-    });
-  } catch (error) {
-    console.error("Error setting up tab switch listener:", error);
-  }
+        });
+    } catch (error) {
+        console.error("Error setting up tab switch listener:", error);
+    }
 }
 
 // Function to initialize sheet mapping
 function initializeSheetMapping() {
-    console.log("DEBUG: Initializing sheet mapping");
+    // console.log("DEBUG: Initializing sheet mapping");
     try {
         // Build normalized mapping once at startup
         const sheetToIndex = {};
@@ -86,7 +86,7 @@ function initializeSheetMapping() {
         window.sheetToIndex = sheetToIndex;
         window.normalizeSheetName = normalize;
         
-        console.log("DEBUG: Sheet mapping initialized:", sheetToIndex);
+        // console.log("DEBUG: Sheet mapping initialized:", sheetToIndex);
     } catch (error) {
         console.error("Error initializing sheet mapping:", error);
     }
@@ -94,57 +94,57 @@ function initializeSheetMapping() {
 
 // Function to be called when viz is ready
 function ready() {
-  console.log("Viz is ready, checking sheet type");
-  if (!window.viz) {
-    console.error("Viz not initialized!");
-    return;
-  }
-
-  try {
-    // Initialize sheet mapping if not already done
-    if (!window.sheetToIndex) {
-      initializeSheetMapping();
+    // console.log("Viz is ready, checking sheet type");
+    if (!window.viz) {
+        console.error("Viz not initialized!");
+        return;
     }
 
-    // Get the container
-    vizDiv = document.getElementById("viz1745364540836");
-    if (!vizDiv) {
-      console.error("Viz container not found!");
-      return;
+    try {
+        // Initialize sheet mapping if not already done
+        if (!window.sheetToIndex) {
+            initializeSheetMapping();
+        }
+
+        // Get the container
+        vizDiv = document.getElementById("viz1745364540836");
+        if (!vizDiv) {
+            console.error("Viz container not found!");
+            return;
+        }
+
+        // Get sheet info for scaling
+        const workbook = window.viz.getWorkbook();
+        activeSheet = workbook.getActiveSheet();
+        // console.log("Active sheet:", activeSheet.getName());
+        // console.log("Sheet type:", activeSheet.getSheetType());
+
+        // Set up media query
+        mediaQuery = window.matchMedia(mediaQueryString);
+        
+        // Initial sizing and scaling
+        handleResize();
+
+        // Add resize listener
+        window.addEventListener('resize', debounce(handleResize, 250));
+
+        // Set up tab switch listener
+        setupTabSwitchListener();
+
+        // Check initial sheet
+        checkCurrentSheet();
+
+        // Log initial state
+        // console.log("Initial state:", {
+        //     vizUrl: window.viz.getUrl(),
+        //     workbook: workbook.getName(),
+        //     activeSheet: activeSheet.getName(),
+        //     container: vizDiv.id
+        // });
+
+    } catch (error) {
+        console.error("Error in ready function:", error);
     }
-
-    // Get sheet info for scaling
-    const workbook = window.viz.getWorkbook();
-    activeSheet = workbook.getActiveSheet();
-    console.log("Active sheet:", activeSheet.getName());
-    console.log("Sheet type:", activeSheet.getSheetType());
-
-    // Set up media query
-    mediaQuery = window.matchMedia(mediaQueryString);
-    
-    // Initial sizing and scaling
-    handleResize();
-
-    // Add resize listener
-    window.addEventListener('resize', debounce(handleResize, 250));
-
-    // Set up tab switch listener
-    setupTabSwitchListener();
-
-    // Check initial sheet
-    checkCurrentSheet();
-
-    // Log initial state
-    console.log("Initial state:", {
-      vizUrl: window.viz.getUrl(),
-      workbook: workbook.getName(),
-      activeSheet: activeSheet.getName(),
-      container: vizDiv.id
-    });
-
-  } catch (error) {
-    console.error("Error in ready function:", error);
-  }
 }
 
 // Function to normalize sheet names
@@ -178,42 +178,42 @@ const rawSheetToIndex = {
 
 // Function to find the best matching sheet name
 function findBestMatch(sheetName, sheetNames) {
-  // Convert to lowercase for case-insensitive matching
-  const normalizedInput = sheetName.toLowerCase();
-  
-  // Try exact match first
-  if (sheetNames[normalizedInput] !== undefined) {
-    return normalizedInput;
-  }
-  
-  // Try partial match
-  for (const key in sheetNames) {
-    // Check if either string contains the other
-    if (normalizedInput.includes(key) || key.includes(normalizedInput)) {
-      console.log("DEBUG: Found partial match:", key);
-      return key;
+    // Convert to lowercase for case-insensitive matching
+    const normalizedInput = sheetName.toLowerCase();
+    
+    // Try exact match first
+    if (sheetNames[normalizedInput] !== undefined) {
+        return normalizedInput;
     }
-  }
-  
-  // Try fuzzy match using Levenshtein distance
-  let bestMatch = null;
-  let bestScore = 0;
-  
-  for (const key in sheetNames) {
-    const score = calculateSimilarity(normalizedInput, key);
-    if (score > bestScore) {
-      bestScore = score;
-      bestMatch = key;
+    
+    // Try partial match
+    for (const key in sheetNames) {
+        // Check if either string contains the other
+        if (normalizedInput.includes(key) || key.includes(normalizedInput)) {
+            // console.log("DEBUG: Found partial match:", key);
+            return key;
+        }
     }
-  }
-  
-  // Only use fuzzy match if the similarity is high enough
-  if (bestScore > 0.8) {
-    console.log("DEBUG: Found fuzzy match:", bestMatch, "with score:", bestScore);
-    return bestMatch;
-  }
-  
-  return null;
+    
+    // Try fuzzy match using Levenshtein distance
+    let bestMatch = null;
+    let bestScore = 0;
+    
+    for (const key in sheetNames) {
+        const score = calculateSimilarity(normalizedInput, key);
+        if (score > bestScore) {
+            bestScore = score;
+            bestMatch = key;
+        }
+    }
+    
+    // Only use fuzzy match if the similarity is high enough
+    if (bestScore > 0.8) {
+        // console.log("DEBUG: Found fuzzy match:", bestMatch, "with score:", bestScore);
+        return bestMatch;
+    }
+    
+    return null;
 }
 
 // Function to calculate string similarity using Levenshtein distance

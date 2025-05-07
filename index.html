@@ -133,21 +133,11 @@
             align-items: center;
         }
 
-        #viz1745364540836 {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        .tableauPlaceholder {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        .tableauViz {
+        /* Common styles for Tableau elements */
+        #viz1745364540836,
+        .tableauPlaceholder,
+        .tableauViz,
+        iframe {
             width: 100%;
             height: 100%;
             margin: 0;
@@ -155,10 +145,6 @@
         }
 
         iframe {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
             border: none;
         }
 
@@ -174,7 +160,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s ease;
             z-index: 100;
             padding: 8px;
             border-radius: 50%;
@@ -207,16 +193,15 @@
             word-wrap: break-word;
             line-height: 1.2;
             z-index: 99;
+            top: calc(50% + 30px);
         }
 
         .nav-button-text.prev {
             left: 12.5px;
-            top: calc(50% + 30px);
         }
 
         .nav-button-text.next {
             right: 12.5px;
-            top: calc(50% + 30px);
         }
 
         @media (max-width: 576px) {
@@ -227,7 +212,6 @@
             .viz-container {
                 width: 95%;
                 height: calc(85vh - 60px) !important;
-                padding: 0;
             }
 
             .nav-button {
@@ -250,16 +234,15 @@
             }
 
             .nav-button-text {
-                font-size: 10px;
-                width: 80px;
+                width: 60px;
             }
 
             .nav-button-text.prev {
-                left: 0px;
+                left: 10px;
             }
 
             .nav-button-text.next {
-                right: 0px;
+                right: 10px;
             }
         }
     </style>
