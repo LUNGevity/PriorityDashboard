@@ -400,87 +400,85 @@ function scaleViz(currentWidth, deviceType) {
     
     try {
         // Get all relevant dimensions
-        const containerWidth = vizDiv.offsetWidth;
-        const containerHeight = window.innerHeight * 0.85;
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
+        const HEADER_HEIGHT = 60; // Adjust if your header is a different height
         const dashboardWidth = 1440;
         const dashboardHeight = 810;
         
-        console.log("Dimensions:", {
-            window: {
-                width: windowWidth,
-                height: windowHeight
-            },
-            container: {
-                width: containerWidth,
-                height: containerHeight
-            },
-            dashboard: {
-                width: dashboardWidth,
-                height: dashboardHeight
+        if (deviceType === "phone") {
+            // For mobile: fit width, allow vertical scrolling for tall dashboards, and start below header
+            vizDiv.style.width = "100vw";
+            vizDiv.style.height = "auto";
+            vizDiv.style.minHeight = `calc(100vh - ${HEADER_HEIGHT}px)`;
+            vizDiv.style.position = "static";
+            vizDiv.style.top = null;
+            vizDiv.style.left = null;
+            vizDiv.style.overflow = "visible";
+            vizDiv.style.background = "#f8f9fa";
+            vizDiv.style.marginTop = `${HEADER_HEIGHT}px`;
+
+            // Update tableau-viz elements
+            const elems = document.getElementsByTagName("tableau-viz");
+            for (let i = 0; i < elems.length; i++) {
+                elems[i].style.width = "100vw";
+                elems[i].style.height = "auto";
+                elems[i].style.minHeight = `calc(100vh - ${HEADER_HEIGHT}px)`;
+                elems[i].style.position = "static";
+                elems[i].style.transform = "none";
             }
-        });
 
-        // Calculate scaling factor based on the fixed dashboard size (1366:795 - 16:9 aspect ratio)
-        const scaleX = containerWidth / dashboardWidth;
-        const scaleY = containerHeight / dashboardHeight;
-        const scale = Math.min(scaleX, scaleY);
-
-        console.log("Scaling calculations:", {
-            scaleX,
-            scaleY,
-            finalScale: scale
-        });
-
-        // Calculate the scaled dimensions
-        const scaledWidth = dashboardWidth * scale;
-        const scaledHeight = dashboardHeight * scale;
-
-        // Center the scaled dashboard in the container
-        const translateX = (containerWidth - scaledWidth) / 2;
-        const translateY = (containerHeight - scaledHeight) / 2;
-
-        console.log("Final dimensions:", {
-            scaled: {
-                width: scaledWidth,
-                height: scaledHeight
-            },
-            translation: {
-                x: translateX,
-                y: translateY
+            // Update iframe if present
+            const iframe = vizDiv.querySelector("iframe");
+            if (iframe) {
+                iframe.style.width = "100vw";
+                iframe.style.height = "auto";
+                iframe.style.minHeight = `calc(100vh - ${HEADER_HEIGHT}px)`;
+                iframe.style.border = "none";
+                iframe.style.position = "static";
+                iframe.style.transform = "none";
             }
-        });
+        } else {
+            // For desktop: maintain aspect ratio and scaling
+            let scale, scaledWidth, scaledHeight, translateX, translateY;
+            const containerWidth = vizDiv.offsetWidth;
+            const containerHeight = window.innerHeight * 0.85;
+            const scaleX = containerWidth / dashboardWidth;
+            const scaleY = containerHeight / dashboardHeight;
+            scale = Math.min(scaleX, scaleY);
+            scaledWidth = dashboardWidth * scale;
+            scaledHeight = dashboardHeight * scale;
+            translateX = (containerWidth - scaledWidth) / 2;
+            translateY = (containerHeight - scaledHeight) / 2;
 
-        // Set container to full size
-        vizDiv.style.width = "100%";
-        vizDiv.style.height = "100%";
-        vizDiv.style.overflow = "hidden";
-        vizDiv.style.position = "relative";
+            vizDiv.style.width = "100%";
+            vizDiv.style.height = "100%";
+            vizDiv.style.overflow = "hidden";
+            vizDiv.style.position = "relative";
+            vizDiv.style.marginTop = "0";
 
-        // Update tableau-viz elements
-        const elems = document.getElementsByTagName("tableau-viz");
-        for (let i = 0; i < elems.length; i++) {
-            elems[i].style.width = `${dashboardWidth}px`;
-            elems[i].style.height = `${dashboardHeight}px`;
-            elems[i].style.position = "absolute";
-            elems[i].style.top = "0";
-            elems[i].style.left = "0";
-            elems[i].style.transformOrigin = "top left";
-            elems[i].style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-        }
+            // Update tableau-viz elements
+            const elems = document.getElementsByTagName("tableau-viz");
+            for (let i = 0; i < elems.length; i++) {
+                elems[i].style.width = `${dashboardWidth}px`;
+                elems[i].style.height = `${dashboardHeight}px`;
+                elems[i].style.position = "absolute";
+                elems[i].style.top = "0";
+                elems[i].style.left = "0";
+                elems[i].style.transformOrigin = "top left";
+                elems[i].style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            }
 
-        // Update iframe if present
-        const iframe = vizDiv.querySelector("iframe");
-        if (iframe) {
-            iframe.style.width = `${dashboardWidth}px`;
-            iframe.style.height = `${dashboardHeight}px`;
-            iframe.style.border = "none";
-            iframe.style.position = "absolute";
-            iframe.style.top = "0";
-            iframe.style.left = "0";
-            iframe.style.transformOrigin = "top left";
-            iframe.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            // Update iframe if present
+            const iframe = vizDiv.querySelector("iframe");
+            if (iframe) {
+                iframe.style.width = `${dashboardWidth}px`;
+                iframe.style.height = `${dashboardHeight}px`;
+                iframe.style.border = "none";
+                iframe.style.position = "absolute";
+                iframe.style.top = "0";
+                iframe.style.left = "0";
+                iframe.style.transformOrigin = "top left";
+                iframe.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            }
         }
     } catch (error) {
         console.error("Error in scaleViz:", error);
