@@ -399,28 +399,29 @@ function scaleViz(currentWidth, deviceType) {
     console.log("Scaling viz", { currentWidth, deviceType });
     
     try {
-        // Get all relevant dimensions
-        const HEADER_HEIGHT = 60; // Adjust if your header is a different height
+        // Use 45px header for mobile, 60px for desktop
+        const isMobile = window.matchMedia("(max-width: 576px)").matches;
+        const HEADER_HEIGHT = isMobile ? 45 : 60;
         const dashboardWidth = 1440;
         const dashboardHeight = 810;
         
         if (deviceType === "phone") {
             // For mobile: fit width, allow vertical scrolling for tall dashboards, and start below header
             vizDiv.style.width = "100vw";
-            vizDiv.style.height = "auto";
+            vizDiv.style.height = "810px";
             vizDiv.style.minHeight = `calc(100vh - ${HEADER_HEIGHT}px)`;
             vizDiv.style.position = "static";
             vizDiv.style.top = null;
             vizDiv.style.left = null;
             vizDiv.style.overflow = "visible";
             vizDiv.style.background = "#f8f9fa";
-            vizDiv.style.marginTop = `${HEADER_HEIGHT}px`;
+            vizDiv.style.marginTop = "0";
 
             // Update tableau-viz elements
             const elems = document.getElementsByTagName("tableau-viz");
             for (let i = 0; i < elems.length; i++) {
                 elems[i].style.width = "100vw";
-                elems[i].style.height = "auto";
+                elems[i].style.height = "810px";
                 elems[i].style.minHeight = `calc(100vh - ${HEADER_HEIGHT}px)`;
                 elems[i].style.position = "static";
                 elems[i].style.transform = "none";
@@ -430,7 +431,7 @@ function scaleViz(currentWidth, deviceType) {
             const iframe = vizDiv.querySelector("iframe");
             if (iframe) {
                 iframe.style.width = "100vw";
-                iframe.style.height = "auto";
+                iframe.style.height = "810px";
                 iframe.style.minHeight = `calc(100vh - ${HEADER_HEIGHT}px)`;
                 iframe.style.border = "none";
                 iframe.style.position = "static";
