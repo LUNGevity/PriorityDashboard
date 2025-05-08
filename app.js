@@ -1,3 +1,4 @@
+console.log('JS loaded');
 let vizDiv,
   currentWidth,
   scalingFactor,
@@ -23,45 +24,54 @@ function debounce(func, wait) {
 
 // Function to set up tab switch event listener
 function setupTabSwitchListener() {
-    if (!window.viz) {
-        console.error("Viz not initialized!");
-        return;
-    }
+  if (!window.viz) {
+    console.error("Viz not initialized!");
+    return;
+  }
 
-    try {
-        // Remove any existing listeners first
-        window.viz.removeEventListener('tabswitch');
+  try {
+    // Remove any existing listeners first
+    window.viz.removeEventListener('tabswitch');
+    
+    // Add tab switch listener
+    window.viz.addEventListener('tabswitch', function(event) {
+      try {
+        const oldSheetName = event.getOldSheetName();
+        const newSheetName = event.getNewSheetName();
         
-        // Add tab switch listener
-        window.viz.addEventListener('tabswitch', function(event) {
-            try {
-                const oldSheetName = event.getOldSheetName();
-                const newSheetName = event.getNewSheetName();
-                
-                // Get the normalized sheet name and info
-                const normalizedSheetName = normalize(newSheetName);
-                const sheetInfo = sheetToIndex[normalizedSheetName];
-                
-                if (sheetInfo) {
+        // Get the normalized sheet name and info
+        const normalizedSheetName = normalize(newSheetName);
+        const sheetInfo = sheetToIndex[normalizedSheetName];
+        
+        if (sheetInfo) {
                     // Update navigation state with the original name
-                    updateNavigationState(sheetInfo.originalName);
-                    
-                    // Trigger resize handling after a short delay
-                    setTimeout(() => {
-                        if (window.handleResize) {
-                            window.handleResize();
-                        }
-                        setMobileIframeHeight(sheetInfo.originalName);
-                        observeIframeForMobile(sheetInfo.originalName);
-                    }, 100);
-                }
-            } catch (error) {
-                console.error("Error handling tab switch:", error);
+          updateNavigationState(sheetInfo.originalName);
+          
+          // Trigger resize handling after a short delay
+          setTimeout(() => {
+            if (window.handleResize) {
+              window.handleResize();
             }
-        });
-    } catch (error) {
-        console.error("Error setting up tab switch listener:", error);
-    }
+            if (window.setMobileDashboardScale) {
+              let sheetName = 'Home';
+              if (window.viz && window.viz.getWorkbook) {
+                try {
+                  const workbook = window.viz.getWorkbook();
+                  const currentSheet = workbook.getActiveSheet();
+                  sheetName = currentSheet.getName();
+                } catch (e) {}
+              }
+              window.setMobileDashboardScale(sheetName);
+            }
+          }, 100);
+        }
+      } catch (error) {
+        console.error("Error handling tab switch:", error);
+      }
+    });
+  } catch (error) {
+    console.error("Error setting up tab switch listener:", error);
+  }
 }
 
 // Function to initialize sheet mapping
@@ -87,42 +97,42 @@ function initializeSheetMapping() {
 
 // Function to be called when viz is ready
 function ready() {
-    if (!window.viz) {
-        console.error("Viz not initialized!");
-        return;
+  if (!window.viz) {
+    console.error("Viz not initialized!");
+    return;
+  }
+
+  try {
+    // Initialize sheet mapping if not already done
+    if (!window.sheetToIndex) {
+      initializeSheetMapping();
     }
 
-    try {
-        // Initialize sheet mapping if not already done
-        if (!window.sheetToIndex) {
-            initializeSheetMapping();
-        }
+    // Get the container
+    vizDiv = document.getElementById("viz1745364540836");
+    if (!vizDiv) {
+      console.error("Viz container not found!");
+      return;
+    }
 
-        // Get the container
-        vizDiv = document.getElementById("viz1745364540836");
-        if (!vizDiv) {
-            console.error("Viz container not found!");
-            return;
-        }
+    // Get sheet info for scaling
+    const workbook = window.viz.getWorkbook();
+    activeSheet = workbook.getActiveSheet();
 
-        // Get sheet info for scaling
-        const workbook = window.viz.getWorkbook();
-        activeSheet = workbook.getActiveSheet();
+    // Set up media query
+    mediaQuery = window.matchMedia(mediaQueryString);
+    
+    // Initial sizing and scaling
+    handleResize();
 
-        // Set up media query
-        mediaQuery = window.matchMedia(mediaQueryString);
-        
-        // Initial sizing and scaling
-        handleResize();
+    // Add resize listener
+    window.addEventListener('resize', debounce(handleResize, 250));
 
-        // Add resize listener
-        window.addEventListener('resize', debounce(handleResize, 250));
+    // Set up tab switch listener
+    setupTabSwitchListener();
 
-        // Set up tab switch listener
-        setupTabSwitchListener();
-
-        // Check initial sheet
-        checkCurrentSheet();
+    // Check initial sheet
+    checkCurrentSheet();
 
         // Set iframe height on load
         setTimeout(() => {
@@ -134,12 +144,12 @@ function ready() {
                     sheetName = currentSheet.getName();
                 } catch (e) {}
             }
-            setMobileIframeHeight(sheetName);
+            setMobileDashboardScale(sheetName);
             observeIframeForMobile(sheetName);
         }, 100);
-    } catch (error) {
-        console.error("Error in ready function:", error);
-    }
+  } catch (error) {
+    console.error("Error in ready function:", error);
+  }
 }
 
 // Function to normalize sheet names
@@ -150,6 +160,7 @@ function normalize(name) {
     .trim()
     .toLowerCase();          // normalize case
 }
+window.normalizeSheetName = normalize;
 
 // Raw mapping of sheet names to indices and pages
 const rawSheetToIndex = {
@@ -173,30 +184,30 @@ const rawSheetToIndex = {
 
 // Function to update navigation state based on sheet name
 function updateNavigationState(sheetName) {
-    // If sheetName is a number, it's already an index
-    if (typeof sheetName === 'number') {
-        // Update the navigation state in navigation.js
-        if (window.updateNavigationIndex) {
-            window.updateNavigationIndex(sheetName);
+  // If sheetName is a number, it's already an index
+  if (typeof sheetName === 'number') {
+    // Update the navigation state in navigation.js
+    if (window.updateNavigationIndex) {
+      window.updateNavigationIndex(sheetName);
         }
         // At the end of the function, set dashboard height
         if (window.setDashboardHeight) {
             window.setDashboardHeight(sheetName);
             setTimeout(() => window.setDashboardHeight(sheetName), 500);
-        }
-        return;
     }
-    
-    // Normalize the incoming sheet name
-    const normalizedSheetName = normalize(sheetName);
-    
-    // Get the index and page from the mapping using normalized name
-    const sheetInfo = sheetToIndex[normalizedSheetName];
-    
-    if (sheetInfo) {
-        // Update the navigation state in navigation.js
-        if (window.updateNavigationIndex) {
-            window.updateNavigationIndex(sheetInfo.index);
+    return;
+  }
+  
+  // Normalize the incoming sheet name
+  const normalizedSheetName = normalize(sheetName);
+  
+  // Get the index and page from the mapping using normalized name
+  const sheetInfo = sheetToIndex[normalizedSheetName];
+  
+  if (sheetInfo) {
+    // Update the navigation state in navigation.js
+    if (window.updateNavigationIndex) {
+      window.updateNavigationIndex(sheetInfo.index);
         }
         // At the end of the function, set dashboard height
         if (window.setDashboardHeight) {
@@ -204,60 +215,60 @@ function updateNavigationState(sheetName) {
             setTimeout(() => window.setDashboardHeight(sheetName), 500);
         }
     } else {
-        // Default to Home if sheet name is unknown
-        if (window.updateNavigationIndex) {
-            window.updateNavigationIndex(0);
-        }
+    // Default to Home if sheet name is unknown
+    if (window.updateNavigationIndex) {
+      window.updateNavigationIndex(0);
+    }
         // At the end of the function, set dashboard height
         if (window.setDashboardHeight) {
             window.setDashboardHeight(sheetName);
             setTimeout(() => window.setDashboardHeight(sheetName), 500);
-        }
     }
+  }
 }
 
 // Function to check current sheet
 function checkCurrentSheet() {
-    try {
-        // Get the current URL of the viz
-        const currentUrl = window.viz.getUrl();
+  try {
+    // Get the current URL of the viz
+    const currentUrl = window.viz.getUrl();
 
-        // Get the workbook and active sheet
-        const workbook = window.viz.getWorkbook();
-        const currentSheet = workbook.getActiveSheet();
-        const sheetName = currentSheet.getName();
+    // Get the workbook and active sheet
+    const workbook = window.viz.getWorkbook();
+    const currentSheet = workbook.getActiveSheet();
+    const sheetName = currentSheet.getName();
 
-        // Update navigation state
-        updateNavigationState(sheetName);
-    } catch (error) {
-        console.error("Error checking sheet:", error);
-    }
+    // Update navigation state
+    updateNavigationState(sheetName);
+  } catch (error) {
+    console.error("Error checking sheet:", error);
+  }
 }
 
 // Handle window resize
 function handleResize() {
-    if (!window.viz) {
-        console.error("Viz not initialized!");
-        return;
-    }
+  if (!window.viz) {
+    console.error("Viz not initialized!");
+    return;
+  }
 
-    try {
-        currentWidth = vizDiv.offsetWidth;
+  try {
+    currentWidth = vizDiv.offsetWidth;
 
-        if (mediaQuery.matches) {
-            if (window.viz.device === "desktop" || window.viz.device === "default") {
-                window.viz.device = "phone";
-            }
-            scaleViz(currentWidth, "phone");
-        } else {
-            if (window.viz.device === "phone") {
-                window.viz.device = "desktop";
-            }
-            scaleViz(currentWidth, "desktop");
-        }
-    } catch (error) {
-        console.error("Error in handleResize:", error);
+    if (mediaQuery.matches) {
+      if (window.viz.device === "desktop" || window.viz.device === "default") {
+        window.viz.device = "phone";
+      }
+      scaleViz(currentWidth, "phone");
+    } else {
+      if (window.viz.device === "phone") {
+        window.viz.device = "desktop";
+      }
+      scaleViz(currentWidth, "desktop");
     }
+  } catch (error) {
+    console.error("Error in handleResize:", error);
+  }
 }
 
 // Make handleResize available globally
@@ -309,43 +320,43 @@ function scaleViz(currentWidth, deviceType) {
             let scale, scaledWidth, scaledHeight, translateX, translateY;
             const containerWidth = vizDiv.offsetWidth;
             const containerHeight = window.innerHeight * 0.85;
-            const scaleX = containerWidth / dashboardWidth;
-            const scaleY = containerHeight / dashboardHeight;
+        const scaleX = containerWidth / dashboardWidth;
+        const scaleY = containerHeight / dashboardHeight;
             scale = Math.min(scaleX, scaleY);
             scaledWidth = dashboardWidth * scale;
             scaledHeight = dashboardHeight * scale;
             translateX = (containerWidth - scaledWidth) / 2;
             translateY = (containerHeight - scaledHeight) / 2;
 
-            vizDiv.style.width = "100%";
-            vizDiv.style.height = "100%";
-            vizDiv.style.overflow = "hidden";
-            vizDiv.style.position = "relative";
+        vizDiv.style.width = "100%";
+        vizDiv.style.height = "100%";
+        vizDiv.style.overflow = "hidden";
+        vizDiv.style.position = "relative";
             vizDiv.style.marginTop = "0";
 
-            // Update tableau-viz elements
-            const elems = document.getElementsByTagName("tableau-viz");
-            for (let i = 0; i < elems.length; i++) {
-                elems[i].style.width = `${dashboardWidth}px`;
-                elems[i].style.height = `${dashboardHeight}px`;
-                elems[i].style.position = "absolute";
-                elems[i].style.top = "0";
-                elems[i].style.left = "0";
-                elems[i].style.transformOrigin = "top left";
-                elems[i].style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-            }
+        // Update tableau-viz elements
+        const elems = document.getElementsByTagName("tableau-viz");
+        for (let i = 0; i < elems.length; i++) {
+            elems[i].style.width = `${dashboardWidth}px`;
+            elems[i].style.height = `${dashboardHeight}px`;
+            elems[i].style.position = "absolute";
+            elems[i].style.top = "0";
+            elems[i].style.left = "0";
+            elems[i].style.transformOrigin = "top left";
+            elems[i].style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        }
 
-            // Update iframe if present
-            const iframe = vizDiv.querySelector("iframe");
-            if (iframe) {
-                iframe.style.width = `${dashboardWidth}px`;
-                iframe.style.height = `${dashboardHeight}px`;
-                iframe.style.border = "none";
-                iframe.style.position = "absolute";
-                iframe.style.top = "0";
-                iframe.style.left = "0";
-                iframe.style.transformOrigin = "top left";
-                iframe.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        // Update iframe if present
+        const iframe = vizDiv.querySelector("iframe");
+        if (iframe) {
+            iframe.style.width = `${dashboardWidth}px`;
+            iframe.style.height = `${dashboardHeight}px`;
+            iframe.style.border = "none";
+            iframe.style.position = "absolute";
+            iframe.style.top = "0";
+            iframe.style.left = "0";
+            iframe.style.transformOrigin = "top left";
+            iframe.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
             }
         }
     } catch (error) {
@@ -353,34 +364,72 @@ function scaleViz(currentWidth, deviceType) {
     }
 }
 
-// Function to explicitly set iframe height on mobile
-function setMobileIframeHeight(sheetName) {
-    if (window.matchMedia("(max-width: 576px)").matches) {
-        // Normalize the sheet name for lookup
-        const normalizedSheetName = typeof sheetName === 'string' ? sheetName.trim().toLowerCase() : sheetName;
-        // Build a normalized mapping
-        const normalizedSheetHeights = {};
-        Object.keys(sheetHeights).forEach(key => {
-            normalizedSheetHeights[key.trim().toLowerCase()] = sheetHeights[key];
-        });
-        const height = normalizedSheetHeights[normalizedSheetName] || 2640; // fallback height
-        const vizDiv = document.getElementById("viz1745364540836");
-        if (vizDiv) {
-            const iframe = vizDiv.querySelector("iframe");
-            if (iframe) {
-                console.log('[setMobileIframeHeight] Setting iframe height to', height + 'px', 'for sheet', sheetName);
-                iframe.style.height = height + "px";
-                iframe.style.minHeight = height + "px";
-                iframe.style.maxHeight = height + "px";
-            } else {
-                console.log('[setMobileIframeHeight] No iframe found yet');
-            }
-        }
+let lastMobileWidth = null;
+let initialMobileWidth = null;
+let lastScaledSheetName = null;
+
+function setMobileDashboardScale(sheetName) {
+    console.log('[setMobileDashboardScale] called with sheetName:', sheetName);
+    const isMobile = window.matchMedia("(max-width: 576px)").matches;
+    if (!isMobile) {
+        lastMobileWidth = null; // Reset on desktop
+        initialMobileWidth = null;
+        lastScaledSheetName = null;
+        document.documentElement.style.width = '';
+        document.body.style.width = '';
+        document.documentElement.style.overflowX = '';
+        document.body.style.overflowX = '';
+        return;
+    }
+    const deviceWidth = window.innerWidth;
+    if (initialMobileWidth === null) {
+        initialMobileWidth = deviceWidth;
+        console.log('[setMobileDashboardScale] initialMobileWidth set to:', initialMobileWidth);
+        document.documentElement.style.width = initialMobileWidth + 'px';
+        document.body.style.width = initialMobileWidth + 'px';
+        document.documentElement.style.overflowX = 'hidden';
+        document.body.style.overflowX = 'hidden';
+    }
+    const normalizedSheetName = typeof sheetName === 'string' ? sheetName.trim().toLowerCase() : sheetName;
+    const normalizedLastScaledSheetName = typeof lastScaledSheetName === 'string' ? lastScaledSheetName.trim().toLowerCase() : lastScaledSheetName;
+    if (deviceWidth === lastMobileWidth && normalizedSheetName === normalizedLastScaledSheetName) {
+        console.log('[setMobileDashboardScale] deviceWidth and sheetName unchanged, skipping');
+        return;
+    }
+    lastMobileWidth = deviceWidth;
+    lastScaledSheetName = sheetName;
+    const nativeWidth = 414;
+    const normalizedSheetHeights = {};
+    Object.keys(sheetHeights).forEach(key => {
+        normalizedSheetHeights[key.trim().toLowerCase()] = sheetHeights[key];
+    });
+    const nativeHeight = normalizedSheetHeights[normalizedSheetName] || 2640; // fallback height
+    const scalingFactor = deviceWidth / nativeWidth;
+    const headerHeight = 45;
+    const vizDiv = document.getElementById("viz1745364540836");
+    if (vizDiv) {
+        vizDiv.style.width = nativeWidth + "px";
+        vizDiv.style.height = nativeHeight + "px";
+        vizDiv.style.transform = `scale(${scalingFactor})`;
+        vizDiv.style.transformOrigin = "top left";
+        vizDiv.style.margin = "0 auto";
+        vizDiv.style.marginTop = '';
+        const visualWidth = vizDiv.offsetWidth * scalingFactor;
+        const visualHeight = vizDiv.offsetHeight * scalingFactor;
+        console.log('[setMobileDashboardScale] visual (scaled) width:', visualWidth, 'visual (scaled) height:', visualHeight);
+    }
+    const iframe = vizDiv ? vizDiv.querySelector("iframe") : null;
+    if (iframe) {
+        iframe.style.width = nativeWidth + "px";
+        iframe.style.height = nativeHeight + "px";
+        iframe.style.transform = `scale(1)`; // Let the parent div handle scaling
+        iframe.style.transformOrigin = "top left";
+        iframe.style.margin = "0 auto";
     }
 }
-window.setMobileIframeHeight = setMobileIframeHeight;
+
+// Update all event handlers to call setMobileDashboardScale directly after navigation, tab switch, and on resize/orientation change
 window.addEventListener('resize', () => {
-    // Try to get the current sheet name
     let sheetName = 'Home';
     if (window.viz && window.viz.getWorkbook) {
         try {
@@ -389,9 +438,14 @@ window.addEventListener('resize', () => {
             sheetName = currentSheet.getName();
         } catch (e) {}
     }
-    setMobileIframeHeight(sheetName);
+    setMobileDashboardScale(sheetName);
 });
 window.addEventListener('orientationchange', () => {
+    initialMobileWidth = null; // Reset on orientation change
+    document.documentElement.style.width = '';
+    document.body.style.width = '';
+    document.documentElement.style.overflowX = '';
+    document.body.style.overflowX = '';
     let sheetName = 'Home';
     if (window.viz && window.viz.getWorkbook) {
         try {
@@ -400,53 +454,39 @@ window.addEventListener('orientationchange', () => {
             sheetName = currentSheet.getName();
         } catch (e) {}
     }
-    setMobileIframeHeight(sheetName);
+    setMobileDashboardScale(sheetName);
 });
-
-function observeIframeForMobile(sheetName) {
-    const vizDiv = document.getElementById("viz1745364540836");
-    if (!vizDiv) return;
-    const observer = new MutationObserver(() => {
-        setMobileIframeHeight(sheetName);
-    });
-    observer.observe(vizDiv, { childList: true, subtree: true });
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-    setMobileIframeHeight('Home');
-    observeIframeForMobile('Home');
+    setMobileDashboardScale('Home');
 });
 
 // Function to navigate to a specific sheet by name
 function navigateToSheet(sheetName) {
+    console.log('[navigateToSheet] called with sheetName:', sheetName);
     // Get the sheet info from the mapping
     const normalizedSheetName = normalize(sheetName);
     const sheetInfo = sheetToIndex[normalizedSheetName];
-    
     if (sheetInfo) {
+        console.log('[navigateToSheet] sheetInfo:', sheetInfo);
         // Navigate to the sheet in Tableau using the original name
         if (window.viz) {
             const workbook = window.viz.getWorkbook();
             workbook.activateSheetAsync(sheetInfo.originalName).then(() => {
-                // Update the navigation state
                 updateNavigationState(sheetInfo.originalName);
-                // Set dashboard height for the new sheet
                 if (window.setDashboardHeight) {
                     window.setDashboardHeight(sheetInfo.originalName);
                 }
-                
-                // Trigger resize handling after a short delay to ensure viz is fully rendered
                 setTimeout(() => {
                     if (window.handleResize) {
                         window.handleResize();
                     }
-                    setMobileIframeHeight(sheetInfo.originalName);
-                    observeIframeForMobile(sheetInfo.originalName);
                 }, 100);
             }).catch(error => {
                 console.error("Error activating sheet:", error);
             });
         }
+    } else {
+        console.log('[navigateToSheet] No sheetInfo found for:', sheetName);
     }
 }
 
@@ -461,7 +501,7 @@ window.initializeSheetMapping = initializeSheetMapping;
 
 // Mapping of sheet names to their required heights (in px)
 const sheetHeights = {
-  'Home': 3500,
+  'Home': 5000,
   'Clinical Details': 2500,
   'Metastatic Locations': 2640,
   'Demographics': 2640,
@@ -536,4 +576,11 @@ function setDashboardHeight(sheetName) {
 
 window.setDashboardHeight = setDashboardHeight;
 
-
+function observeIframeForMobile(sheetName) {
+    const vizDiv = document.getElementById("viz1745364540836");
+    if (!vizDiv) return;
+    const observer = new MutationObserver(() => {
+        setMobileDashboardScale(sheetName);
+    });
+    observer.observe(vizDiv, { childList: true, subtree: true });
+}

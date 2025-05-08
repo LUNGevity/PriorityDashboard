@@ -1,5 +1,21 @@
 // Wait for the DOM to be fully loaded
+function waitForSheetToIndex(callback) {
+    if (window.sheetToIndex) {
+        console.log('[waitForSheetToIndex] sheetToIndex is available, initializing navigation');
+        callback();
+    } else {
+        console.log('[waitForSheetToIndex] sheetToIndex not ready, retrying...');
+        setTimeout(() => waitForSheetToIndex(callback), 50);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('[DOMContentLoaded] Waiting for sheetToIndex...');
+    waitForSheetToIndex(initNavigation);
+});
+
+function initNavigation() {
+    console.log('[initNavigation] Navigation logic starting');
     // Get all the necessary elements
     const menuIcon = document.querySelector('.menu-icon');
     const navMenu = document.querySelector('.nav-menu');
@@ -9,12 +25,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextButton = document.querySelector('.nav-button.next');
     const prevButtonText = document.querySelector('.nav-button-text.prev');
     const nextButtonText = document.querySelector('.nav-button-text.next');
+    console.log('[initNavigation] Elements:', { menuIcon, navMenu, closeButton, menuItems, prevButton, nextButton });
     
     // Initialize the Tableau visualization
     function navigateToPage(page) {
+        console.log('[navigateToPage] Called with page:', page);
         const url = "https://public.tableau.com/views/LUNGevityProjectPRIORITYDashboard/" + encodeURIComponent(page);
         
         if (window.viz) {
+            console.log('[navigateToPage] Disposing existing viz');
             window.viz.dispose();
         }
         
@@ -25,10 +44,12 @@ document.addEventListener('DOMContentLoaded', function() {
             width: '100%',
             height: '100%',
             onFirstInteractive: function() {
+                console.log('[navigateToPage] onFirstInteractive fired');
                 if (window.viz) {
                     const workbook = window.viz.getWorkbook();
                     const currentSheet = workbook.getActiveSheet();
                     const sheetName = currentSheet.getName();
+                    console.log('[navigateToPage] onFirstInteractive currentSheet:', sheetName);
                     
                     // Get the normalized sheet name and info
                     const normalizedSheetName = window.normalizeSheetName(sheetName);
@@ -58,11 +79,17 @@ document.addEventListener('DOMContentLoaded', function() {
                             window.handleResize();
                         }
                     }, 100);
+
+                    // Trigger scaling for the new sheet
+                    if (window.setMobileDashboardScale) {
+                        window.setMobileDashboardScale(sheetName);
+                    }
                 }
             }
         };
         
         window.viz = new tableau.Viz(vizDiv, url, options);
+        console.log('[navigateToPage] New viz created with url:', url);
     }
 
     // Get the current page index
@@ -78,6 +105,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const items = Array.from(menuItems);
         
         try {
+            if (!window.sheetToIndex) {
+                console.error('sheetToIndex is undefined in updateNavigationButtonTexts');
+                return;
+            }
+            const sheetNames = Object.values(window.sheetToIndex).map(info => info.originalName);
+            console.log('[updateNavigationButtonTexts] sheetNames:', sheetNames, 'currentIndex:', currentIndex);
+            
             // Get sheet info for the current index
             const currentSheetInfo = Object.values(window.sheetToIndex).find(info => info.index === currentIndex);
             
@@ -200,9 +234,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle menu item clicks
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
+            console.log('[menuItem click] Clicked:', this, 'data-page:', this.getAttribute('data-page'));
             menuItems.forEach(i => i.classList.remove('active'));
             this.classList.add('active');
             const page = this.getAttribute('data-page');
+            console.log('[menuItem click] Navigating to page:', page);
             navigateToPage(page);
             navMenu.classList.remove('active');
             document.body.style.overflow = '';
@@ -228,9 +264,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to update navigation state based on sheet name
     function updateNavigationState(sheetName) {
-        // Use the global mapping and normalization function
+        console.log('[updateNavigationState] Called with sheetName:', sheetName);
         const normalizedSheetName = window.normalizeSheetName(sheetName);
         const sheetInfo = window.sheetToIndex[normalizedSheetName];
+        console.log('[updateNavigationState] normalizedSheetName:', normalizedSheetName, 'sheetInfo:', sheetInfo);
         
         if (sheetInfo) {
             // Update the navigation state
@@ -305,4 +342,4 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-}); 
+} 

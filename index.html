@@ -213,25 +213,23 @@
                 padding: 0;
             }
             .viz-container {
-                width: 100vw;
-                height: auto !important;
-                min-height: calc(100vh - 45px) !important;
-                min-height: calc(100dvh - 45px) !important;
-                align-items: flex-start;
-            }
-            .viz-container,
-            #viz1745364540836,
-            .tableauPlaceholder,
-            .tableauViz {
                 width: 100vw !important;
-                min-height: calc(100vh - 45px) !important; /* fallback for older browsers */
-                min-height: calc(100dvh - 45px) !important; /* preferred for modern browsers */
-                max-height: none !important;
-                display: block;
+                overflow-x: hidden !important;
+                display: flex !important;
+                justify-content: flex-start !important;
+                align-items: flex-start !important;
+                position: relative;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #f8f9fa;
             }
-            iframe {
-                width: 100vw !important;
-                display: block;
+            #viz1745364540836 {
+                position: relative;
+                left: 0;
+                margin: 0 !important;
+                margin-top: 45px !important;
+                /* width/height set by JS */
+                transform-origin: left top;
             }
             .nav-button,
             .nav-button-text {
