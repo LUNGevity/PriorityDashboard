@@ -51,6 +51,8 @@ function setupTabSwitchListener() {
                         if (window.handleResize) {
                             window.handleResize();
                         }
+                        setMobileIframeHeight(sheetInfo.originalName);
+                        observeIframeForMobile(sheetInfo.originalName);
                     }, 100);
                 }
             } catch (error) {
@@ -121,6 +123,20 @@ function ready() {
 
         // Check initial sheet
         checkCurrentSheet();
+
+        // Set iframe height on load
+        setTimeout(() => {
+            let sheetName = 'Home';
+            if (window.viz && window.viz.getWorkbook) {
+                try {
+                    const workbook = window.viz.getWorkbook();
+                    const currentSheet = workbook.getActiveSheet();
+                    sheetName = currentSheet.getName();
+                } catch (e) {}
+            }
+            setMobileIframeHeight(sheetName);
+            observeIframeForMobile(sheetName);
+        }, 100);
     } catch (error) {
         console.error("Error in ready function:", error);
     }
@@ -337,9 +353,68 @@ function scaleViz(currentWidth, deviceType) {
     }
 }
 
-// Initialize when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait for viz to be ready
+// Function to explicitly set iframe height on mobile
+function setMobileIframeHeight(sheetName) {
+    if (window.matchMedia("(max-width: 576px)").matches) {
+        // Normalize the sheet name for lookup
+        const normalizedSheetName = typeof sheetName === 'string' ? sheetName.trim().toLowerCase() : sheetName;
+        // Build a normalized mapping
+        const normalizedSheetHeights = {};
+        Object.keys(sheetHeights).forEach(key => {
+            normalizedSheetHeights[key.trim().toLowerCase()] = sheetHeights[key];
+        });
+        const height = normalizedSheetHeights[normalizedSheetName] || 2640; // fallback height
+        const vizDiv = document.getElementById("viz1745364540836");
+        if (vizDiv) {
+            const iframe = vizDiv.querySelector("iframe");
+            if (iframe) {
+                console.log('[setMobileIframeHeight] Setting iframe height to', height + 'px', 'for sheet', sheetName);
+                iframe.style.height = height + "px";
+                iframe.style.minHeight = height + "px";
+                iframe.style.maxHeight = height + "px";
+            } else {
+                console.log('[setMobileIframeHeight] No iframe found yet');
+            }
+        }
+    }
+}
+window.setMobileIframeHeight = setMobileIframeHeight;
+window.addEventListener('resize', () => {
+    // Try to get the current sheet name
+    let sheetName = 'Home';
+    if (window.viz && window.viz.getWorkbook) {
+        try {
+            const workbook = window.viz.getWorkbook();
+            const currentSheet = workbook.getActiveSheet();
+            sheetName = currentSheet.getName();
+        } catch (e) {}
+    }
+    setMobileIframeHeight(sheetName);
+});
+window.addEventListener('orientationchange', () => {
+    let sheetName = 'Home';
+    if (window.viz && window.viz.getWorkbook) {
+        try {
+            const workbook = window.viz.getWorkbook();
+            const currentSheet = workbook.getActiveSheet();
+            sheetName = currentSheet.getName();
+        } catch (e) {}
+    }
+    setMobileIframeHeight(sheetName);
+});
+
+function observeIframeForMobile(sheetName) {
+    const vizDiv = document.getElementById("viz1745364540836");
+    if (!vizDiv) return;
+    const observer = new MutationObserver(() => {
+        setMobileIframeHeight(sheetName);
+    });
+    observer.observe(vizDiv, { childList: true, subtree: true });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setMobileIframeHeight('Home');
+    observeIframeForMobile('Home');
 });
 
 // Function to navigate to a specific sheet by name
@@ -365,6 +440,8 @@ function navigateToSheet(sheetName) {
                     if (window.handleResize) {
                         window.handleResize();
                     }
+                    setMobileIframeHeight(sheetInfo.originalName);
+                    observeIframeForMobile(sheetInfo.originalName);
                 }, 100);
             }).catch(error => {
                 console.error("Error activating sheet:", error);

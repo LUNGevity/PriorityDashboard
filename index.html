@@ -215,19 +215,22 @@
             .viz-container {
                 width: 100vw;
                 height: auto !important;
-                min-height: calc(100vh - 45px) !important; /* fallback for older browsers */
-                min-height: calc(100dvh - 45px) !important; /* preferred for modern browsers */
+                min-height: calc(100vh - 45px) !important;
+                min-height: calc(100dvh - 45px) !important;
                 align-items: flex-start;
             }
             .viz-container,
             #viz1745364540836,
             .tableauPlaceholder,
-            .tableauViz,
-            iframe {
+            .tableauViz {
                 width: 100vw !important;
                 min-height: calc(100vh - 45px) !important; /* fallback for older browsers */
                 min-height: calc(100dvh - 45px) !important; /* preferred for modern browsers */
                 max-height: none !important;
+                display: block;
+            }
+            iframe {
+                width: 100vw !important;
                 display: block;
             }
             .nav-button,
