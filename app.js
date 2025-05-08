@@ -384,7 +384,7 @@ window.initializeSheetMapping = initializeSheetMapping;
 
 // Mapping of sheet names to their required heights (in px)
 const sheetHeights = {
-  'Home': 1500,
+  'Home': 3500,
   'Clinical Details': 2500,
   'Metastatic Locations': 2640,
   'Demographics': 2640,

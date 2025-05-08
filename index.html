@@ -215,7 +215,8 @@
             .viz-container {
                 width: 100vw;
                 height: auto !important;
-                min-height: calc(100vh - 45px) !important;
+                min-height: calc(100vh - 45px) !important; /* fallback for older browsers */
+                min-height: calc(100dvh - 45px) !important; /* preferred for modern browsers */
                 align-items: flex-start;
             }
             .viz-container,
@@ -224,8 +225,8 @@
             .tableauViz,
             iframe {
                 width: 100vw !important;
-                /* height: 2640px !important; */
-                min-height: calc(100vh - 45px) !important;
+                min-height: calc(100vh - 45px) !important; /* fallback for older browsers */
+                min-height: calc(100dvh - 45px) !important; /* preferred for modern browsers */
                 max-height: none !important;
                 display: block;
             }
