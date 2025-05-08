@@ -214,10 +214,20 @@
             }
             .viz-container {
                 width: 100vw;
+                height: auto !important;
                 min-height: calc(100vh - 45px) !important;
-                height: 810px !important;
-                margin-top: 45px !important;
                 align-items: flex-start;
+            }
+            .viz-container,
+            #viz1745364540836,
+            .tableauPlaceholder,
+            .tableauViz,
+            iframe {
+                width: 100vw !important;
+                /* height: 2640px !important; */
+                min-height: calc(100vh - 45px) !important;
+                max-height: none !important;
+                display: block;
             }
             .nav-button,
             .nav-button-text {
@@ -290,17 +300,14 @@
                 width: '100%',
                 height: '100%',
                 onFirstInteractive: function() {
-                    console.log("Viz is ready");
-                    if (window.viz) {
-                        ready();
-        }
+                    ready();
                 },
                 onTabSwitched: function(event) {
-                    console.log("Tab switched event:", event);
-                    const sheetName = event.getSheetName();
-                    console.log("Switched to sheet:", sheetName);
-                    updateNavigationState(sheetName);
-        }
+                    const sheetName = event.getNewSheetName();
+                    if (window.setDashboardHeight) {
+                        window.setDashboardHeight(sheetName);
+                    }
+                }
             };
             window.viz = new tableau.Viz(vizDiv, url, options);
         });
