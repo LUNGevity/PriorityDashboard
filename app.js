@@ -408,8 +408,11 @@ function setMobileDashboardScale(sheetName) {
     const headerHeight = 45;
     const vizDiv = document.getElementById("viz1745364540836");
     if (vizDiv) {
-        vizDiv.style.width = nativeWidth + "px";
-        vizDiv.style.height = nativeHeight + "px";
+        // Force width/height with !important
+        vizDiv.style.setProperty('width', nativeWidth + 'px', 'important');
+        vizDiv.style.setProperty('height', nativeHeight + 'px', 'important');
+        // Debug log for offsetWidth before scaling
+        console.log('[setMobileDashboardScale] vizDiv.offsetWidth before scaling:', vizDiv.offsetWidth);
         vizDiv.style.transform = `scale(${scalingFactor})`;
         vizDiv.style.transformOrigin = "top left";
         vizDiv.style.margin = "0 auto";
@@ -420,8 +423,8 @@ function setMobileDashboardScale(sheetName) {
     }
     const iframe = vizDiv ? vizDiv.querySelector("iframe") : null;
     if (iframe) {
-        iframe.style.width = nativeWidth + "px";
-        iframe.style.height = nativeHeight + "px";
+        iframe.style.setProperty('width', nativeWidth + 'px', 'important');
+        iframe.style.setProperty('height', nativeHeight + 'px', 'important');
         iframe.style.transform = `scale(1)`; // Let the parent div handle scaling
         iframe.style.transformOrigin = "top left";
         iframe.style.margin = "0 auto";
@@ -463,16 +466,16 @@ document.addEventListener('DOMContentLoaded', () => {
 // Function to navigate to a specific sheet by name
 function navigateToSheet(sheetName) {
     console.log('[navigateToSheet] called with sheetName:', sheetName);
-    // Get the sheet info from the mapping
-    const normalizedSheetName = normalize(sheetName);
-    const sheetInfo = sheetToIndex[normalizedSheetName];
-    if (sheetInfo) {
+  // Get the sheet info from the mapping
+  const normalizedSheetName = normalize(sheetName);
+  const sheetInfo = sheetToIndex[normalizedSheetName];
+  if (sheetInfo) {
         console.log('[navigateToSheet] sheetInfo:', sheetInfo);
-        // Navigate to the sheet in Tableau using the original name
-        if (window.viz) {
-            const workbook = window.viz.getWorkbook();
-            workbook.activateSheetAsync(sheetInfo.originalName).then(() => {
-                updateNavigationState(sheetInfo.originalName);
+    // Navigate to the sheet in Tableau using the original name
+    if (window.viz) {
+      const workbook = window.viz.getWorkbook();
+      workbook.activateSheetAsync(sheetInfo.originalName).then(() => {
+        updateNavigationState(sheetInfo.originalName);
                 if (window.setDashboardHeight) {
                     window.setDashboardHeight(sheetInfo.originalName);
                 }
@@ -481,13 +484,13 @@ function navigateToSheet(sheetName) {
                         window.handleResize();
                     }
                 }, 100);
-            }).catch(error => {
+      }).catch(error => {
                 console.error("Error activating sheet:", error);
-            });
-        }
-    } else {
-        console.log('[navigateToSheet] No sheetInfo found for:', sheetName);
+      });
     }
+  } else {
+        console.log('[navigateToSheet] No sheetInfo found for:', sheetName);
+  }
 }
 
 // Make the navigation functions available globally
@@ -580,7 +583,46 @@ function observeIframeForMobile(sheetName) {
     const vizDiv = document.getElementById("viz1745364540836");
     if (!vizDiv) return;
     const observer = new MutationObserver(() => {
-        setMobileDashboardScale(sheetName);
+        console.log('[observeIframeForMobile] MutationObserver triggered for sheet:', sheetName);
+        // setMobileDashboardScale(sheetName);
     });
-    observer.observe(vizDiv, { childList: true, subtree: true });
+    // observer.observe(vizDiv, { childList: true, subtree: true }); // Disabled for debugging
+}
+
+// Add this at the end of your file or after the dashboard is initialized
+function addStyleMutationDebugObserver() {
+    const vizDiv = document.getElementById("viz1745364540836");
+    if (!vizDiv) return;
+    const iframe = vizDiv.querySelector("iframe");
+    const nativeWidth = 414;
+    const logStyleChange = (target, label) => {
+        console.log(`[MutationObserver] ${label} style changed:`, target.style.cssText);
+    };
+    const observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                logStyleChange(mutation.target, mutation.target === vizDiv ? '#vizDiv' : 'iframe');
+                // If Tableau sets width to 100vw, immediately set it back to 414px and re-apply scaling
+                if (mutation.target.style.width === '100vw') {
+                    mutation.target.style.setProperty('width', nativeWidth + 'px', 'important');
+                    if (mutation.target === vizDiv && window.setMobileDashboardScale) {
+                        // Use the last scaled sheet name or 'Home' as fallback
+                        window.setMobileDashboardScale(window.lastScaledSheetName || 'Home');
+                    }
+                }
+            }
+        }
+    });
+    observer.observe(vizDiv, { attributes: true, attributeFilter: ['style'] });
+    if (iframe) {
+        observer.observe(iframe, { attributes: true, attributeFilter: ['style'] });
+    }
+    console.log('[MutationObserver] Debug observer attached to #vizDiv and iframe');
+}
+
+// Attach the observer after DOMContentLoaded and after Tableau viz is created
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(addStyleMutationDebugObserver, 1000);
+} else {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(addStyleMutationDebugObserver, 1000));
 }
