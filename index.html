@@ -94,6 +94,7 @@
             margin: 0;
             height: calc(100vh - 80px);
             overflow-y: auto;
+            padding-bottom: 60px;
         }
 
         .nav-menu-item {
@@ -112,6 +113,13 @@
         .nav-menu-item.active {
             background-color: rgba(0, 56, 101, 0.1);
             font-weight: 500;
+        }
+
+        .nav-menu-spacer {
+            height: 40px;
+            border: none;
+            background: transparent;
+            pointer-events: none;
         }
 
         .main-content {
@@ -209,10 +217,36 @@
                 height: 45px;
             }
             .main-content {
+                padding: 0;
+                flex-direction: column;
+                align-items: center;
                 margin-top: 0;
                 padding: 0;
             }
             .viz-container {
+                width: 95%;
+                height: calc(85dvh - 60px) !important;
+                margin-top: 10px;
+                margin-bottom: 0;
+            }
+
+            .nav-arrows-wrapper {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 4px;
+            }
+
+            .nav-button, .nav-button-text {
+                position: static;
+                transform: none;
+                margin: 0;
+                top: auto;
+                left: auto;
+                right: auto;
+                z-index: 1;
                 width: 100vw !important;
                 min-width: 0 !important;
                 max-width: 100vw !important;
@@ -225,6 +259,13 @@
                 padding: 0 !important;
                 background: #f8f9fa;
             }
+            .nav-button.prev, .nav-button-text.prev {
+                margin-left: 10px;
+                margin-right: 0;
+            }
+            .nav-button.next, .nav-button-text.next {
+                margin-right: 10px;
+                margin-left: 0;
             #viz1745364540836 {
                 position: relative;
                 left: 0;
@@ -235,8 +276,40 @@
             }
             .nav-button,
             .nav-button-text {
+                width: auto;
+                text-align: center;
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+
+        @media (max-height: 576px) {
+            .header {
+                height: 45px !important;
+            }
+            .viz-container {
+                width: 100%;
+                height: calc(100dvh - 45px);
+                margin: 0 auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+                .nav-menu-list {
+                height: calc(100dvh - 60px);
+            }
+        }
+
+        @media (max-width: 576px), (max-height: 576px) {
+            .nav-menu-spacer {
+                height: 100px;
                 display: none !important;
             }
+        }
+
+        #viz1745364540836 {
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
@@ -270,25 +343,29 @@
             <li class="nav-menu-item" data-page="MentalHealth">Mental Health & Social Support</li>
             <li class="nav-menu-item" data-page="CareTeamSupport">Care Team Support</li>
             <li class="nav-menu-item" data-page="FAQ">FAQ</li>
+            <li class="nav-menu-spacer"></li>
         </ul>
     </div>
 
     <main class="main-content">
-        <button class="nav-button prev" aria-label="Previous page">
-            <svg viewBox="0 0 24 24">
-                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-            </svg>
-        </button>
-        <span class="nav-button-text prev"></span>
         <div class="viz-container">
             <div id='viz1745364540836'></div>
         </div>
-        <button class="nav-button next" aria-label="Next page">
-            <svg viewBox="0 0 24 24">
-                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-            </svg>
-        </button>
-        <span class="nav-button-text next"></span>
+        <div class="nav-arrows-wrapper">
+            <button class="nav-button prev" aria-label="Previous page">
+                <svg viewBox="0 0 24 24">
+                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                </svg>
+            </button>
+            <span class="nav-button-text prev"></span>
+            <span style="flex:1"></span>
+            <span class="nav-button-text next"></span>
+            <button class="nav-button next" aria-label="Next page">
+                <svg viewBox="0 0 24 24">
+                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                </svg>
+            </button>
+        </div>
     </main>
 
     <script type="text/javascript" src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
@@ -303,6 +380,7 @@
                 hideToolbar: false,
                 width: '100%',
                 height: '100%',
+                device: 'desktop',
                 onFirstInteractive: function() {
                     ready();
                 },
