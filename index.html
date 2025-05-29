@@ -156,6 +156,15 @@
             border: none;
         }
 
+        .nav-button, .nav-button-text {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-button.ready, .nav-button-text.ready {
+            opacity: 1;
+        }
+
         .nav-button {
             position: fixed;
             top: 50%;
@@ -372,6 +381,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             const vizDiv = document.getElementById("viz1745364540836");
             const loadingSpinner = document.querySelector('.loading-spinner');
+            const navButtons = document.querySelectorAll('.nav-button');
+            const navTexts = document.querySelectorAll('.nav-button-text');
             const url = "https://public.tableau.com/views/LUNGevityProjectPRIORITYDashboard/Home";
             const options = {
                 hideTabs: false,
@@ -383,10 +394,12 @@
                     console.log("Viz is ready");
                     if (window.viz) {
                         ready();
-                        // Show the viz after it's properly sized
+                        // Show the viz and navigation elements after it's properly sized
                         setTimeout(() => {
                             vizDiv.classList.add('ready');
                             loadingSpinner.classList.add('hidden');
+                            navButtons.forEach(btn => btn.classList.add('ready'));
+                            navTexts.forEach(text => text.classList.add('ready'));
                         }, 100);
                     }
                 },
