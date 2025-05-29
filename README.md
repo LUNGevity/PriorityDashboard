@@ -10,7 +10,7 @@ This interactive dashboard visualizes the survey responses from lung cancer pati
 
 **Tableau Public:** [View the original visualization](https://public.tableau.com/app/profile/chesie.yu/viz/LUNGevityProjectPRIORITYDashboard/Home)
 
-## Dashboard Sections
+### Dashboard Sections
 
 The dashboard is organized into the following key sections:
 
@@ -18,13 +18,13 @@ The dashboard is organized into the following key sections:
 
 2. **Clinical Details** - Overview of the survey participants
 
-3. **Location Where Cancer Has Spread** - Where the cancer has spread in the body (metastasis); the most common locations for spread
+3. **Location Where Cancer Has Spread** - Where the cancer has spread in the body (metastasis), the most common locations for spread
 
 4. **Who Was in the Study** - Personal information (demographics) of the patients and caregivers who participated in the study
 
-5. **Diagnostic Story** - How participants were diagnosed; how long people waited for a referral to an oncologist
+5. **Diagnostic Story** - How participants were diagnosed, how long people waited for a referral to an oncologist
 
-6. **Biomarker Testing at Diagnosis** - The experiences of patients with biomarker testing, including whether they were tested for EGFR mutations as well as other biomarkers and the timeline from diagnosis to receiving their biomarker results
+6. **Biomarker Testing at Diagnosis** - Experiences of patients with biomarker testing
 
 7. **Tobacco Exposure** - Exposure to tobacco for participants, including smoking history and duration
 
@@ -32,9 +32,9 @@ The dashboard is organized into the following key sections:
 
 9. **Treatment for Those Diagnosed with Stage I/II** - First-line treatments reported by participants with stage I/II EGFR-positive lung cancer, changes in the stage of the disease
 
-10. **Treatment for Those Diagnosed with Stage III** - Treatments reported by participants diagnosed with stage III EGFR-positive lung cancer, options after the first treatment (first-line) stops working, changes in the stage of the disease
+10. **Treatment for Those Diagnosed with Stage III** - Treatments reported by participants diagnosed with stage III EGFR-positive lung cancer, changes in the stage of the disease
 
-11. **Treatment for Those Diagnosed with Stage IV** - Treatments reported by participants diagnosed with stage IV EGFR-positive lung cancer, options after the first treatment (first-line) stops working, changes in the stage of the disease
+11. **Treatment for Those Diagnosed with Stage IV** - Treatments reported by participants diagnosed with stage IV EGFR-positive lung cancer, changes in the stage of the disease
 
 12. **Side Effects** - Treatment side effects reported by patient participants who were, at the time of completing the survey, taking osimertinib as their first treatment
 
@@ -46,11 +46,18 @@ The dashboard is organized into the following key sections:
 
 16. **FAQ** - Frequently asked questions
 
+### Key Functionalities
+- **Interactive Visualizations**: Click, hover, and filter data points
+- **Responsive Design**: Adapts to desktop and mobile devices
+- **Smooth Transitions**: Seamless navigation between sections
+- **Accessible Navigation**: Clear and intuitive user interface
+
+
 ## User Guide
 
 ### Navigation
 - **Menu Navigation**: 
-  - Click the menu icon (☰) in the top-left corner to access all dashboard sections
+  - Click the **menu icon (☰)** in the top-left corner to access all dashboard sections
   - Select any section from the menu to navigate directly
   - Click outside the menu or press ESC to close it
 
@@ -66,14 +73,7 @@ The dashboard is organized into the following key sections:
   - Use filters to explore specific data subsets
   - Each section provides unique interactive visualizations
 
-### Key Functionalities
-- **Responsive Design**: Adapts to desktop and mobile devices
-- **Interactive Visualizations**: Click, hover, and filter data points
-- **Smooth Transitions**: Seamless navigation between sections
-- **Accessible Navigation**: Clear and intuitive user interface
-
-## How to Run the App
-
+### How to Run the App
 1. Clone the repository:
    ```bash
    git clone https://github.com/LUNGevity/PriorityDashboard.git
@@ -93,6 +93,7 @@ The dashboard is organized into the following key sections:
    ```
    http://localhost:8000
    ```
+
 
 ## File Structure
 
