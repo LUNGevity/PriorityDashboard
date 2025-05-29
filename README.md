@@ -1,99 +1,116 @@
 # LUNGevity Project PRIORITY Dashboard
 
 ## Overview
-This dashboard provides an interactive visualization of lung cancer patient data, allowing users to explore various aspects of patient demographics, clinical details, and treatment outcomes.
 
-## Navigation Guide
+**Project PRIORITY** (Patient Reported Initiative On Resistance, Incidence, Treatment studY survey) was an online survey completed in **2019** by people living with EGFR lung cancer. The goal of this study was to understand the treatment experience of EGFR-positive lung cancer patients.
 
-### Menu Navigation
-- Use the menu icon in the top-left corner to access the full navigation menu
-- Click on any menu item to navigate directly to that section
-- The menu can be closed by clicking the X button or clicking outside the menu
+This interactive dashboard visualizes the survey responses from lung cancer patients and caregivers, providing insights into their treatment journeys, clinical experiences, and outcomes. Through intuitive navigation and responsive design, users can explore detailed patient demographics, treatment patterns, side effects, and quality of life metrics.
 
-### Arrow Navigation
-- Use the left and right arrows on the sides of the screen to move between sections sequentially
-- The arrows will show the name of the next/previous section
-- Navigation is disabled (arrows hidden) when at the first or last section
+**Live Dashboard:** [View the dashboard here](https://lungevity.github.io/PriorityDashboard/)
 
-### Tab Navigation
-- Within each section, you can use the tabs at the top of the visualization to switch between different views
-- The navigation state will automatically update to reflect the current tab
+**Tableau Public:** [View the original visualization](https://public.tableau.com/app/profile/chesie.yu/viz/LUNGevityProjectPRIORITYDashboard/Home)
 
-### Keyboard Navigation
-- Use the left and right arrow keys to navigate between sections
-- Press ESC to close the menu if it's open
+## Dashboard Sections
 
-### Responsive Design
-- The dashboard automatically adjusts to different screen sizes
-- On mobile devices, the visualization will switch to a mobile-optimized view
-- The navigation menu becomes a slide-out panel on mobile devices
-- Navigation buttons and text are optimized for both desktop and mobile views
+The dashboard is organized into the following key sections:
 
-## Sections
-1. Home - Overview and introduction
-2. Clinical Details - Patient clinical information
-3. Metastatic Locations - Details about cancer spread
-4. Demographics - Patient demographic data
-5. Diagnostic Story - Patient diagnosis journey
-6. Biomarker Testing - Results of biomarker tests
-7. Tobacco Exposure - Smoking history and exposure
-8. Other Risk Factors and Exposures - Additional risk factors
-9. Treatment for Those Diagnosed with Stage I/II - Early stage treatment details
-10. Treatment for Those Diagnosed with Stage III - Stage III treatment information
-11. Treatment for Those Diagnosed with Stage IV - Stage IV treatment details
-12. Side Effects - Treatment side effects
-13. Experience with Clinical Trial - Clinical trial participation
-14. Mental Health - Mental health aspects
-15. Care Team Support - Support team information
-16. FAQ - Frequently asked questions
+1. **Home** - Overview and introduction to the dashboard
 
-## Technical Details
-- Built using Tableau for data visualization
-- Responsive design optimized for both desktop and mobile viewing
-- Modern, clean interface with intuitive navigation
-- Optimized for modern web browsers
+2. **Clinical Details** - Overview of the survey participants
 
-## Features
+3. **Location Where Cancer Has Spread** - Where the cancer has spread in the body (metastasis); the most common locations for spread
 
-- Interactive Tableau dashboard integration
-- Responsive design that works across different screen sizes
-- Navigation menu with easy access to different sections
-- Previous/Next navigation buttons for sequential browsing
+4. **Who Was in the Study** - Personal information (demographics) of the patients and caregivers who participated in the study
 
-## Setup
+5. **Diagnostic Story** - How participants were diagnosed; how long people waited for a referral to an oncologist
+
+6. **Biomarker Testing at Diagnosis** - The experiences of patients with biomarker testing, including whether they were tested for EGFR mutations as well as other biomarkers and the timeline from diagnosis to receiving their biomarker results
+
+7. **Tobacco Exposure** - Exposure to tobacco for participants, including smoking history and duration
+
+8. **Other Risk Factors and Exposures** - Participants' exposures and risk factors for lung cancer
+
+9. **Treatment for Those Diagnosed with Stage I/II** - First-line treatments reported by participants with stage I/II EGFR-positive lung cancer, changes in the stage of the disease
+
+10. **Treatment for Those Diagnosed with Stage III** - Treatments reported by participants diagnosed with stage III EGFR-positive lung cancer, options after the first treatment (first-line) stops working, changes in the stage of the disease
+
+11. **Treatment for Those Diagnosed with Stage IV** - Treatments reported by participants diagnosed with stage IV EGFR-positive lung cancer, options after the first treatment (first-line) stops working, changes in the stage of the disease
+
+12. **Side Effects** - Treatment side effects reported by patient participants who were, at the time of completing the survey, taking osimertinib as their first treatment
+
+13. **Experience with Clinical Trial** - Participants' experience with clinical trials
+
+14. **Mental Health & Social Support** - Mental and emotional well-being of patients following their diagnosis of EGFR-positive lung cancer
+
+15. **Care Team Support** - Relationship participants have with the doctor who provides the treatment for their lung cancer
+
+16. **FAQ** - Frequently asked questions
+
+## User Guide
+
+### Navigation
+- **Menu Navigation**: 
+  - Click the menu icon (☰) in the top-left corner to access all dashboard sections
+  - Select any section from the menu to navigate directly
+  - Click outside the menu or press ESC to close it
+
+- **Arrow Navigation**:
+  - Use the arrow buttons on either side of the screen to move between sections
+  - On desktop: arrows appear on the left and right sides
+  - On mobile: arrows are positioned at the bottom of the screen
+  - Keyboard shortcuts: Use left/right arrow keys to navigate
+
+- **Interactive Features**:
+  - Click on data points to see detailed information
+  - Hover over elements to view tooltips
+  - Use filters to explore specific data subsets
+  - Each section provides unique interactive visualizations
+
+### Key Functionalities
+- **Responsive Design**: Adapts to desktop and mobile devices
+- **Interactive Visualizations**: Click, hover, and filter data points
+- **Smooth Transitions**: Seamless navigation between sections
+- **Accessible Navigation**: Clear and intuitive user interface
+
+## How to Run the App
 
 1. Clone the repository:
-```bash
-git clone https://github.com/LUNGevity/PriorityDashboard.git
+   ```bash
+   git clone https://github.com/LUNGevity/PriorityDashboard.git
+   ```
+
+2. Navigate to the project directory:
+   ```bash
+   cd PriorityDashboard
+   ```
+
+3. Start a local server:
+   ```bash
+   python3 -m http.server 8000
+   ```
+
+4. Open your browser and visit:
+   ```
+   http://localhost:8000
+   ```
+
+## File Structure
+
+```
+PriorityDashboard/
+├── index.html          # Main HTML file
+├── app.js             # Core application logic
+├── navigation.js      # Navigation functionality
+└── README.md          # This documentation
 ```
 
-2. Open the project directory:
-```bash
-cd PriorityDashboard
-```
+## Recent Updates (5/29/2025)
 
-3. Serve the files using a local web server. For example, using Python:
-```bash
-# Python 3
-python -m http.server 8000
-```
-
-4. Open your browser and navigate to `http://localhost:8000`
-
-## Structure
-
-- `index.html` - Main HTML file containing the dashboard structure and styles
-- `navigation.js` - JavaScript file handling navigation and Tableau visualization
-- `README.md` - Project documentation
-- `.gitignore` - Git ignore file
-
-## Recent Updates
-
-- Optimized dashboard size for maximum visibility
-- Improved navigation button and text positioning
-- Enhanced mobile responsiveness
-- Cleaned up and optimized CSS code
-- Improved overall layout and spacing
+- Added loading spinner for improved user experience
+- Enhanced mobile navigation with bottom-positioned controls
+- Optimized dashboard loading sequence
+- Improved navigation element visibility timing
+- Streamlined code structure and removed unused functions
 
 ## License
 
